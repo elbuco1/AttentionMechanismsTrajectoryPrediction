@@ -13,7 +13,8 @@ def main():
     dir_name = parameters_project["evaluation_reports"] + "{}/"
 
     models_list = visualization_parameters["models"]
-    metrics_list = visualization_parameters["metrics"]
+
+    save_dir = parameters_project["figures_reports"]
 
 
     
@@ -33,73 +34,68 @@ def main():
     
     
     socials = np.array([social_0,social_5,social_1])
-    print(socials)
-    unit = ["0.1","0.5","1.0"]
-    print(socials)
-
-    fig, axs = plt.subplots(3, 1)
     
-    axs[0].plot(unit,socials[:,0])
-    axs[0].plot(unit,socials[:,1])
-    axs[0].set_title('Social losses')
-    axs[0].set(xlabel='distance threshold (m)', ylabel='conflict percentage')
+    unit = ["0.1","0.5","1.0"]
+    
 
+    fig, ax = plt.subplots()
+    
+    for i in range( socials.shape[1]):
+        ax.plot(unit,socials[:,i], label = models_list[i])
+    # axs[0].plot(unit,socials[:,1])
+    ax.set_title('Social losses')
+    ax.set(xlabel='distance threshold (m)', ylabel='conflict percentage')
+    ax.legend()
+
+    fig.tight_layout()
+    plt.savefig(save_dir+"social_losses.png")
+    plt.close()
     # ade fde 
     ade = []
     fde = []
 
+    fig, ax = plt.subplots()
+
     for model in models_list:
-        print(dir_name.format(model))
         losses = json.load(open(dir_name.format(model)+"losses.json"))
         ade.append(losses["global"]["ade_disjoint"])
         fde.append(losses["global"]["fde_disjoint"])
     positions = np.array([ade,fde])
 
 
-    for x,y in zip(positions[0,:],positions[1,:]):
-        print(x,y)
-        axs[1].scatter(x,y)
-    axs[1].set_title('Positionnal losses')
-    axs[1].set(xlabel='Averade Displacement Error (m)', ylabel='Final Displacement Error (m)')
-
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    for x,y,model in zip(positions[0,:],positions[1,:],models_list):
+        ax.scatter(x,y,label = model)
+    ax.set_title('Displacement losses')
+    ax.set(xlabel='Average Displacement Error (m)', ylabel='Final Displacement Error (m)')
+    ax.legend()
     fig.tight_layout()
-    plt.show()
-
-    # print(social_0)
-    # print(social_5)
-    # print(social_1)
+    plt.savefig(save_dir+"displacement_losses.png")
+    plt.close()
 
 
+    # dynamic losses
+    fig, ax = plt.subplots()
 
-    # fig, axs = plt.subplots(3, 1)
+    speeds = []
+    accelerations = []
+    for model in models_list:
+        losses = json.load(open(dir_name.format(model)+"dynamic_losses.json"))
+        speeds.append(losses["speed"]["global"])
+        accelerations.append(losses["acceleration"]["global"])
+    dynamics = np.array([speeds,accelerations])
 
+    for x,y,model in zip(dynamics[0,:],dynamics[1,:],models_list):
+        ax.scatter(x,y,label = model)
+    ax.set_title('Dynamic losses')
+    ax.set(xlabel='Speed distributions distance', ylabel='Acceleration distributions distance')
+    ax.legend()
 
-
-
-    # for ax,metric in zip(axs.flat,metrics_list):
-    #     print(metric)
-
-
-
-    # plt.show()
-    # print(nb_rows)
+    fig.tight_layout()
+    plt.savefig(save_dir+"dynamic_losses.png")
+    plt.close()
 
     
-
-
-    
+          
 
 
 if __name__ == "__main__":

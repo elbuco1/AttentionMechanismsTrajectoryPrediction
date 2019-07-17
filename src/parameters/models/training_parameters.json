@@ -1,6 +1,6 @@
 {
 
-    "model":"social_attention",
+    "model":"rnn_mlp",
     "set_type_train": "train_eval",
     "set_type_test": "test",
     "load_path" : "",  
@@ -11,7 +11,7 @@
     "unjoint_optimisation":1,
 
     "n_epochs" : 10,
-    "batch_size": 16 ,    
+    "batch_size": 32 ,    
     "lr" : 0.0001, 
 
     
