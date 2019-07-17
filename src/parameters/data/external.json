@@ -1,0 +1,16 @@
+{
+    "used_scenes": [
+        "deathCircle",
+        "gates",
+        "little"
+    ],
+    "types": {
+        "biker": "bicycle",
+        "pedestrian": "pedestrian",
+        "cart": "cart",
+        "car": "car",
+        "bus": "bus",
+        "skater": "skate"
+    },
+    "dataset_name": "sdd"
+}

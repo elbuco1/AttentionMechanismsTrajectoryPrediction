@@ -1,3 +1,20 @@
+data/raw/*
+data/external/*
+data/interim/*
+data/processed/*
+reports/evaluation/*
+reports/figures/*
+reports/gradients/*
+reports/losses/*
+models/evaluation/*
+models/training/*
+
+*Makefile*
+*.gitkeep*
+*.rst 
+*.bat
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

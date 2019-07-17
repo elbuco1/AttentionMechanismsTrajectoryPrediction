@@ -1,0 +1,7 @@
+{
+    "rnn_mlp":"./src/parameters/models/rnn_mlp.json",
+    "cnn_mlp":"./src/parameters/models/cnn_mlp.json",
+    "social_attention":"./src/parameters/models/social_attention.json"
+
+
+}

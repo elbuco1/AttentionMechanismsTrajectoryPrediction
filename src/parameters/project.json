@@ -1,0 +1,40 @@
+{
+    "raw_data":"./data/raw/",
+    "interim_data":"./data/interim/",
+    "external_data":"./data/external/",
+    "processed_data":"./data/interim/processed/",
+
+    "raw_dataset":"./data/raw/trajectories/",
+    "interim_dataset":"./data/interim/",
+    "external_dataset":"./data/external/trajectories/",
+
+    "raw_images":"./data/raw/images/",
+
+
+
+    "data_external_parameters":"./src/parameters/data/external.json",
+    "data_raw_parameters":"./src/parameters/data/raw.json",
+    "data_processed_parameters":"./src/parameters/data/processed.json",
+    "training_parameters":"./src/parameters/models/training_parameters.json",
+    "models_parameters": "./src/parameters/models/models.json",
+    "evaluation_parameters": "./src/parameters/models/evaluation_parameters.json",
+    "visualization_parameters":"./src/parameters/visualization/visualization_parameters.json",
+
+   
+    "hdf5_samples":"./data/processed/samples.hdf5",
+    "training_hdf5": "./data/processed/training.hdf5",
+
+    "gradients_reports":"./reports/gradients/",
+    "losses_reports":"./reports/losses/",
+    "figures_reports":"./reports/figures/",
+
+    "models_reports":"./models/training/",
+    "models_evaluation":"./models/evaluation/",
+
+
+    "evaluation_reports":"./reports/evaluation/"
+
+
+
+
+}

@@ -1,0 +1,37 @@
+{
+    "old_framerate":30,
+    "new_framerate":2.5,
+    "digit_number":2,
+    "scenes":[
+       
+        "deathCircle0", 
+        "deathCircle1",         
+        "deathCircle2", 
+        "deathCircle3", 
+        "deathCircle4", 
+        "gates1",         
+        "gates3", 
+        "gates4", 
+        "gates5",                           
+        "little0", 
+        "little1", 
+        "little3"
+    ],
+    "pixel_meter_ratios" :{
+        "gates3": 0.03451552014799965,
+        "gates2": 0.037273148932529955,
+        "gates4":  0.04412270398344871,
+        "little1":  0.028543001718203717,
+        "gates1":  0.03770843227414929,
+        "little0": 0.02893050511914739,
+        "little3": 0.0286390330645745,
+        "deathCircle2":  0.03948339355717032,
+        "deathCircle1":  0.03907717155954873,
+        "deathCircle0":  0.04063972028155109,
+        "deathCircle3":  0.02847812514990737,
+        "little2":  0.028543529556248295,
+        "gates5":  0.034239280481315214,
+        "deathCircle4":  0.0389800771352891
+        
+      }
+}

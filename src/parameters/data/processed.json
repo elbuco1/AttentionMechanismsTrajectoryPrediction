@@ -1,0 +1,61 @@
+{
+    "shift": 3,
+    "t_obs": 8,
+    "t_pred": 12,
+    "padding":-1,
+    
+    "types_dic":{
+        "bicycle":1,
+        "pedestrian":2,
+        "car":3,
+        "skate":4,
+        "cart":5,
+        "bus":6
+    },
+    "types_dic_rev":{
+        "1":"bicycle",
+        "2":"pedestrian",
+        "3":"car",
+        "4":"skate",
+        "5":"cart",
+        "6":"bus"
+    },
+    "scenes":[
+       
+        "deathCircle0", 
+        "deathCircle1",         
+        "deathCircle2", 
+        "deathCircle3", 
+        "deathCircle4", 
+        "gates1",         
+        "gates3", 
+        "gates4", 
+        "gates5",                           
+        "little0", 
+        "little1", 
+        "little3"
+    ],
+    "train_scenes":[
+        "deathCircle0", 
+        "deathCircle1",         
+        "deathCircle2", 
+        "deathCircle3", 
+        "deathCircle4",       
+        "gates3", 
+        "gates4", 
+        "gates5",  
+        "little1", 
+        "little3"
+
+    ],
+    "test_scenes":[
+        "gates1",
+        "little0"
+
+    ],
+    "eval_scenes":[
+        "deathCircle2",
+        "gates3"
+    ]
+
+}
