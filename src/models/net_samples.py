@@ -15,8 +15,6 @@ import numpy as np
 import os 
 
 def main():
-    args = sys.argv
-
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")    
     torch.manual_seed(42)
    

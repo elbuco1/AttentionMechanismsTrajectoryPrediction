@@ -70,7 +70,6 @@ def main():
         "use_neighbors":net_params["use_neighbors"],
         "offsets":training_parameters["offsets"],
         "offsets_input" : training_parameters["offsets_input"],
-        "normalize": training_parameters["normalize"],
         "model_name":model_name
         }
         net_type = RNN_MLP
@@ -93,7 +92,6 @@ def main():
         "use_neighbors":net_params["use_neighbors"],
         "offsets":training_parameters["offsets"],
         "offsets_input" : training_parameters["offsets_input"],
-        "normalize": training_parameters["normalize"],
         "model_name":model_name
 
         }
@@ -122,7 +120,6 @@ def main():
             "use_neighbors":net_params["use_neighbors"],
             "offsets":training_parameters["offsets"],
             "offsets_input" : training_parameters["offsets_input"],
-            "normalize": training_parameters["normalize"],
             "model_name":model_name
 
         }     
@@ -157,7 +154,6 @@ def main():
         "net" : net,
         "print_every" : training_parameters["print_every"],
         "nb_grad_plots" : training_parameters["nb_grad_plots"],
-        "nb_sample_plots" : training_parameters["nb_sample_plots"],
         "train" : training_parameters["train"],
         "gradients_reports": parameters_project["gradients_reports"],
         "losses_reports": parameters_project["losses_reports"],

@@ -1,4 +1,20 @@
 {
     "scene":"gates1",
-    "sample_id": 10 
+    "sample_id": 10 ,
+    "models":[
+        "rnn_mlp",
+        "test"
+    ],
+    "metrics":[
+        "ade_disjoint",
+        "fde_disjoint",
+        "social_joint_0.1",
+        "social_joint_0.5",
+        "social_joint_1.0",
+        "speed",
+        "acceleration"
+
+
+    ],
+    "nb_columns":2
 }

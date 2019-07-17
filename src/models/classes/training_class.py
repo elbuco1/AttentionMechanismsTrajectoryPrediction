@@ -34,7 +34,6 @@ class NetTraining():
         self.net = args["net"]
         self.print_every = args["print_every"]
         self.nb_grad_plots = args["nb_grad_plots"]
-        self.nb_sample_plots = args["nb_sample_plots"]
         self.train_model = args["train"]
         self.gradient_reports = args["gradients_reports"]
         self.losses_reports = args["losses_reports"]

@@ -1,6 +1,6 @@
 {
 
-    "model":"cnn_mlp",
+    "model":"social_attention",
     "set_type_train": "train_eval",
     "set_type_test": "test",
     "load_path" : "",  
@@ -10,23 +10,18 @@
    
     "unjoint_optimisation":1,
 
-    "n_epochs" : 5,
-    "batch_size": 32 ,    
+    "n_epochs" : 10,
+    "batch_size": 16 ,    
     "lr" : 0.0001, 
 
     
     "plot": 1,
-    "plot_every": 5,
+    "plot_every": 1,
     "save_every":1,
     "print_every":10,
-    "nb_grad_plots":10,
-    "nb_sample_plots":5,
+    "nb_grad_plots":1,
 
 
-
-    "normalize":0,
     "offsets":1,
-    "offsets_input":0,
-    "use_type":0,    
-    "use type: 0 non, 1:ohe, 2:word_embedding":""
+    "offsets_input":0
 }
