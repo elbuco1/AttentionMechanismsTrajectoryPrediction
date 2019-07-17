@@ -1,6 +1,6 @@
 {
     "batch_size":1,
-    "model_name":"rnn_mlp",
-    "report_name":"rnn_mlp",
+    "model_name":"social_attention",
+    "report_name":"social_attention",
     "set_type_test":"test"
 }

@@ -34,7 +34,9 @@ class Animation():
         self.meter2pixel_ratio = 1.0/ self.pixel_meter_ratios[self.scene]
 
 
-        report_name = evaluation_parameters["report_name"]
+        # report_name = evaluation_parameters["report_name"]
+        report_name = visualization_parameters["report_name"]
+
           
 
         sub_dir_name = parameters_project["evaluation_reports"] + "{}/scene_reports/".format(report_name) 

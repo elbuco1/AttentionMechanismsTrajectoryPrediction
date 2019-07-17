@@ -1,9 +1,11 @@
 {
-    "scene":"gates1",
-    "sample_id": 10 ,
+    "scene":"little0",
+    "sample_id": 30 ,
+    "report_name":"cnn_mlp",
     "models":[
         "rnn_mlp",
-        "test"
+        "cnn_mlp",
+        "social_attention"
     ],
     "metrics":[
         "ade_disjoint",
