@@ -14,7 +14,7 @@ def main():
 
     models_list = visualization_parameters["models"]
 
-    save_dir = parameters_project["figures_reports"]
+    save_dir = parameters_project["metrics_reports"]
 
 
     
@@ -25,7 +25,6 @@ def main():
     social_1 = []
 
     for model in models_list:
-        print(dir_name.format(model))
         losses = json.load(open(dir_name.format(model)+"losses.json"))
         social_0.append(100*losses["global"]["social_joint_0.1"])
         social_5.append(100*losses["global"]["social_joint_0.5"])
@@ -43,7 +42,7 @@ def main():
     for i in range( socials.shape[1]):
         ax.plot(unit,socials[:,i], label = models_list[i])
     # axs[0].plot(unit,socials[:,1])
-    ax.set_title('Social losses')
+    ax.set_title('Social metrics')
     ax.set(xlabel='distance threshold (m)', ylabel='conflict percentage')
     ax.legend()
 
@@ -65,7 +64,7 @@ def main():
 
     for x,y,model in zip(positions[0,:],positions[1,:],models_list):
         ax.scatter(x,y,label = model)
-    ax.set_title('Displacement losses')
+    ax.set_title('Displacement metrics')
     ax.set(xlabel='Average Displacement Error (m)', ylabel='Final Displacement Error (m)')
     ax.legend()
     fig.tight_layout()
@@ -86,7 +85,7 @@ def main():
 
     for x,y,model in zip(dynamics[0,:],dynamics[1,:],models_list):
         ax.scatter(x,y,label = model)
-    ax.set_title('Dynamic losses')
+    ax.set_title('Dynamic metrics')
     ax.set(xlabel='Speed distributions distance', ylabel='Acceleration distributions distance')
     ax.legend()
 

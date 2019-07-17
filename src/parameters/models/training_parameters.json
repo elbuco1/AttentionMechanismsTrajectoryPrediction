@@ -1,6 +1,6 @@
 {
 
-    "model":"rnn_mlp",
+    "model":"cnn_mlp",
     "set_type_train": "train_eval",
     "set_type_test": "test",
     "load_path" : "",  

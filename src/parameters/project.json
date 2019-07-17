@@ -27,6 +27,10 @@
     "gradients_reports":"./reports/gradients/",
     "losses_reports":"./reports/losses/",
     "figures_reports":"./reports/figures/",
+    "animations_reports":"./reports/figures/animations/",
+    "metrics_reports":"./reports/figures/metrics/",
+
+
 
     "models_reports":"./models/training/",
     "models_evaluation":"./models/evaluation/",

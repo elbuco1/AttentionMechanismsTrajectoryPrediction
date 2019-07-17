@@ -40,7 +40,7 @@ class Animation():
         sub_dir_name = parameters_project["evaluation_reports"] + "{}/scene_reports/".format(report_name) 
 
         self.scene_samples = sub_dir_name + "{}_samples.json".format(self.scene)
-        self.gif_name = parameters_project["figures_reports"] + "{}_{}.gif".format(self.scene,self.sample_id)
+        self.gif_name = parameters_project["animations_reports"] + "{}_{}.gif".format(self.scene,self.sample_id)
 
 
         self.image = parameters_project["raw_images"] + "{}.jpg".format(self.scene)
