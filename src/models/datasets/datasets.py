@@ -9,6 +9,8 @@ import h5py
 import cv2
 import time
 import helpers.helpers_training as helpers
+from models.pretrained_vgg import customCNN1
+
 # import helpers
 from joblib import load
 import sys
@@ -62,10 +64,12 @@ class CustomDataLoader():
 """
 class Hdf5Dataset():
       'Characterizes a dataset for PyTorch'
-      def __init__(self,padding,hdf5_file,scene_list,t_obs,t_pred,set_type, data_type,use_neighbors,
+      def __init__(self,padding,hdf5_file,scene_list,t_obs,t_pred,set_type, data_type,use_neighbors,use_images,images_path,
                   use_masks = False,reduce_batches = True, predict_offsets = 0,offsets_input = 0,evaluation = 0):
 
-                       
+            self.use_images = use_images   
+            self.images_path = images_path + "{}.jpg"
+
             self.set_type = set_type
             self.scene_list = scene_list
 
@@ -92,6 +96,8 @@ class Hdf5Dataset():
                   self.dset_types = "types_{}_{}".format(set_type,data_type)   
                   self.coord_dset = self.hdf5_file[self.dset_name]  
                   self.types_dset = self.hdf5_file[self.dset_types]  
+                  self.dset_img_name = "images_{}_{}".format(set_type,data_type)
+                  self.scenes_dset = self.hdf5_file[self.dset_img_name]  
             
             self.t_obs = t_obs
             self.t_pred = t_pred
@@ -100,6 +106,8 @@ class Hdf5Dataset():
                      
 
             self.shape = self.coord_dset.shape
+            if self.use_images:
+                  self.images = self.__load_images()
             
       def __del__(self):
             self.hdf5_file.close()
@@ -113,6 +121,9 @@ class Hdf5Dataset():
             types,X,y,seq = [],[],[],[]
             max_batch = self.coord_dset.shape[1]
  
+            scenes = [self.scene_list[0] for _ in range(len(ids))]
+            if not self.evaluation:                             
+                  scenes = [img.decode('UTF-8') for img in self.scenes_dset[ids]]
             
             seq = self.coord_dset[ids]
             X = seq[:,:,:self.t_obs]
@@ -153,6 +164,11 @@ class Hdf5Dataset():
                   out.append(points_mask)
                   out.append(torch.LongTensor(active_mask))
             
+            imgs = torch.FloatTensor([])
+            if self.use_images:
+                  imgs = torch.stack([self.images[img] for img in scenes],dim = 0) 
+            out.append(imgs)
+
             out.append(y_last)
             out.append(X_last)
 
@@ -251,3 +267,62 @@ class Hdf5Dataset():
 
             return X,y,(active_mask_in,active_mask),active_last_points,original_x
 
+      def __load_images(self):#cuda
+            images = {}
+            print("loading images features")
+            cnn = customCNN1()
+            cnn.eval()
+            cnn = cnn.cuda()
+            paddings = self.__get_paddings()
+            for scene,pad in zip(self.scene_list,paddings):
+                  img = Image.open(self.images_path.format(scene))
+                  transform = transforms.Compose([
+                        transforms.Pad(pad),
+                        transforms.ToTensor(),
+                        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                  ])
+
+                  img = transform(img)
+                  img = img.cuda()
+                  
+                  img = img.unsqueeze(0)
+                  img = cnn(img)
+                  img = img.squeeze(0)
+
+                  img = img.cpu()
+                  images[scene] = img
+                  
+
+            print("Done!")
+            
+            return images
+      def __get_paddings(self):
+            widths,heights = [],[]
+            for scene in self.scene_list:
+                  img = np.array(Image.open(self.images_path.format(scene)))
+                  height,width,_ = img.shape
+                  heights.append(height)
+                  widths.append(width)
+            max_height = np.max(heights)
+            max_width = np.max(widths)
+            max_dim = max(max_height,max_width)
+            paddings = []
+            for scene in self.scene_list:
+                  img = np.array(Image.open(self.images_path.format(scene)))
+                  height,width,_ = img.shape
+                  pad_height = max_dim - height
+                  pad_width = max_dim  - width 
+
+                  pad_height = self.__get_pad(pad_height)
+                  pad_width = self.__get_pad(pad_width)
+                  padding = (pad_width[0],pad_height[0],pad_width[1],pad_height[1])
+                  paddings.append(padding)
+            return paddings
+
+      def __get_pad(self,v):
+            if v % 2 == 0:
+                  v = int(v/2)
+                  return (v,v)
+            else:
+                  v = int(v/2)
+                  return (v,v+1)

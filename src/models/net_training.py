@@ -130,7 +130,7 @@ def main():
     # init neural network
     net = net_type(args_net)
 
-    train_loader,eval_loader,_,_ = helpers.load_data_loaders(processed_parameters,training_parameters,args_net,data_file,scenes)
+    train_loader,eval_loader,_,_ = helpers.load_data_loaders(parameters_project, processed_parameters,training_parameters,args_net,data_file,scenes)
     
     net = net.to(device)
     optimizer = optim.Adam(net.parameters(),lr = training_parameters["lr"])

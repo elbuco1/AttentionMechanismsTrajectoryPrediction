@@ -78,6 +78,7 @@ class PrepareTraining():
                 # create partitions in hdf5 file for samples and agents types
                 samples = dest_file.create_dataset("samples_{}".format(name),shape=(0,max_neighboors,self.seq_len,2),maxshape = (None,max_neighboors,self.seq_len,2),dtype='float32',chunks=(15,max_neighboors,self.seq_len,2))
                 types = dest_file.create_dataset("types_{}".format(name),shape=(0,max_neighboors,self.nb_types-1),maxshape = (None,max_neighboors,self.nb_types-1),dtype='float32')
+                images = dest_file.create_dataset("images_{}".format(name),shape=(0,),maxshape = (None,),dtype="S20")
 
                 
                 # for each scene in the former hdf5 file, add
@@ -88,6 +89,8 @@ class PrepareTraining():
 
                     nb_neighbors = dset[0].shape[0] 
                     nb_samples = int(prop*dset.shape[0])
+                    scenes = np.array([np.string_(key) for _ in range(np.abs(nb_samples))])
+                    
 
                     # variable number of agents in samples so we need padding
                     padding = np.ones(shape = (np.abs(nb_samples), max_neighboors-nb_neighbors,self.seq_len,2))
@@ -98,6 +101,7 @@ class PrepareTraining():
                     # resize hdf5 array size
                     samples.resize(samples.shape[0]+np.abs(nb_samples),axis=0)
                     types.resize(types.shape[0]+np.abs(nb_samples),axis=0)
+                    images.resize(images.shape[0]+np.abs(nb_samples),axis=0)
 
 
                     
@@ -106,11 +110,13 @@ class PrepareTraining():
                         samples[-nb_samples:] = np.concatenate((dset[:nb_samples],padding),axis = 1)
                         ohe_types = np.array([self.ohe.transform(d.reshape(-1,1))  for d in dset_types[:nb_samples]])
                         types[-nb_samples:] = np.concatenate((ohe_types[:,:,1:],padding_types),axis = 1)
+                        images[-nb_samples:] = scenes
                     # add the last nb_samples samples of the scene to the new dataset
                     else:
                         samples[nb_samples:] = np.concatenate((dset[nb_samples:],padding),axis = 1)
                         ohe_types = np.array([self.ohe.transform(d.reshape(-1,1))  for d in dset_types[nb_samples:]])
                         types[nb_samples:] = np.concatenate((ohe_types[:,:,1:],padding_types),axis = 1)
+                        images[nb_samples:] = scenes
 
     def __get_ohe_types(self):
         cat = np.arange(self.nb_types).reshape(self.nb_types,1)

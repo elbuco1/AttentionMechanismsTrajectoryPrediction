@@ -132,17 +132,19 @@ class NetTraining():
             start_time = time.time()
             
             # Load data
-            inputs, labels,types,points_mask, active_mask,_,_ = data
+            inputs, labels,types,points_mask, active_mask,imgs,_,_ = data
             inputs = inputs.to(self.device)
             labels =  labels.to(self.device)
             types =  types.to(self.device)       
             active_mask = active_mask.to(self.device)
+            imgs =  imgs.to(self.device)        
+
 
             
             # gradients to zero
             self.optimizer.zero_grad()
             # predict using network
-            outputs = self.net((inputs,types,active_mask,points_mask))
+            outputs = self.net((inputs,types,active_mask,points_mask,imgs))
     
             # keep mask for prediction part only
             points_mask = points_mask[1]
@@ -203,13 +205,14 @@ class NetTraining():
         for i,data in enumerate(self.eval_loader):
 
             # Load data
-            inputs, labels,types,points_mask, active_mask,target_last,input_last = data
+            inputs, labels,types,points_mask, active_mask,imgs,target_last,input_last = data
             inputs = inputs.to(self.device)
             labels =  labels.to(self.device)
             types =  types.to(self.device)
             active_mask = active_mask.to(self.device)
+            imgs =  imgs.to(self.device)        
             
-            outputs = self.net((inputs.clone(),types,active_mask,points_mask))
+            outputs = self.net((inputs.clone(),types,active_mask,points_mask,imgs))
             
          
             
@@ -255,14 +258,14 @@ class NetTraining():
         for i,data in enumerate(eval_loader):
 
             # Load data
-            inputs, labels,types,points_mask, active_mask,target_last,input_last = data
+            inputs, labels,types,points_mask, active_mask,imgs,target_last,input_last = data
             inputs = inputs.to(self.device)
             labels =  labels.to(self.device)
             types =  types.to(self.device)
             imgs =  imgs.to(self.device)        
-            active_mask = active_mask.to(self.device)
+            active_mask = active_mask.to(self.device)      
             
-            outputs = self.net((inputs,types,active_mask,points_mask))
+            outputs = self.net((inputs,types,active_mask,points_mask,imgs))
             
             
             inputs,labels,outputs = helpers.offsets_to_trajectories(inputs.detach().cpu().numpy(),

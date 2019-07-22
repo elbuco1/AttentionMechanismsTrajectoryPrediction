@@ -1,8 +1,8 @@
 {
 
-    "model":"cnn_mlp",
-    "set_type_train": "train_eval",
-    "set_type_test": "test",
+    "model":"rnn_mlp",
+    "set_type_train": "train",
+    "set_type_test": "eval",
     "load_path" : "",  
 
     "train":1,
