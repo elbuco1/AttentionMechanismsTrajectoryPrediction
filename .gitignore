@@ -3,7 +3,9 @@ data/external/*
 data/interim/*
 data/processed/*
 reports/evaluation/*
-reports/figures/*
+reports/figures/animations/*
+reports/figures/metrics/*
+
 reports/gradients/*
 reports/losses/*
 models/evaluation/*
