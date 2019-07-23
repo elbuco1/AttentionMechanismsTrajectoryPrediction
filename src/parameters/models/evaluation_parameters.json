@@ -2,5 +2,21 @@
     "batch_size":1,
     "model_name":"social_attention",
     "report_name":"social_attention",
-    "set_type_test":"test"
+    "set_type_test":"test",
+    "spatial_annotations": "./data/external/spatial_annotations/",
+    "user_spatial_profile":{
+        "3":1,
+        "5":1,
+        "6":1,
+        "1":0,
+        "4":2,
+        "2":2
+
+    },
+    "spatial_profiles":{
+        "obstacle_ped":0,
+        "obstacle_car":1,
+        "obstacle_bicycle":2
+    }
+
 }

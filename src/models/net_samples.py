@@ -1,6 +1,8 @@
 from models.rnn_mlp import RNN_MLP
 from models.social_attention import SocialAttention
 from models.cnn_mlp import CNN_MLP
+from models.spatial_attention import SpatialAttention
+
 
 
 import time
@@ -52,6 +54,8 @@ def main():
         net = CNN_MLP(args_net)     
     elif model == "social_attention":
         net = SocialAttention(args_net)
+    elif model == "spatial_attention":
+        net = SpatialAttention(args_net)
 
     # loading trained network
     net.load_state_dict(checkpoint['state_dict'])
@@ -95,7 +99,7 @@ def main():
         scene_dict = {} # save every sample in the scene
               
         # get dataloader
-        data_loader = helpers_evaluation.get_data_loader(data_file,scene,args_net,processed_parameters,evaluation_parameters)
+        data_loader = helpers_evaluation.get_data_loader(parameters_project,data_file,scene,args_net,processed_parameters,evaluation_parameters)
         
         sample_id = 0
 
@@ -104,9 +108,10 @@ def main():
         
         for batch_idx, data in enumerate(data_loader):
                 
-            inputs, labels,types,points_mask, active_mask,target_last,input_last = data
+            inputs, labels,types,points_mask, active_mask,imgs,target_last,input_last = data
             inputs = inputs.to(device)
             labels =  labels.to(device)
+            imgs = imgs.to(device)
 
             # active mask for training, along batch*numbr_agent axis
             active_mask = active_mask.to(device)
@@ -119,7 +124,7 @@ def main():
 
             start = time.time()
             if not args_net["use_neighbors"]:
-                outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_naive(inputs,types,active_mask,points_mask,net,device)
+                outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_naive(inputs,types,active_mask,points_mask,net,device,imgs)
 
 
             else:

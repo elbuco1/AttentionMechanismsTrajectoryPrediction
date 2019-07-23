@@ -31,6 +31,17 @@ def main():
     raw_parameters = json.load(open(parameters_project["data_raw_parameters"]))
 
 
+    # spatial loss variables
+    spatial_annotations = evaluation_parameters["spatial_annotations"]+"{}.jpg.json"
+    images = parameters_project["raw_images"]+"{}.jpg"
+    types_to_spatial = evaluation_parameters["user_spatial_profile"]
+    spatial_profiles = evaluation_parameters["spatial_profiles"]
+    pixel_meter_ratios = raw_parameters["pixel_meter_ratios"]
+        # self.meter2pixel_ratio = 1.0/ self.pixel_meter_ratios[self.scene]
+
+    #########################
+
+
 
     # loading training data
     report_name = evaluation_parameters["report_name"]
@@ -73,6 +84,11 @@ def main():
         helpers_evaluation.convert_losses(losses,"social_",social_results)
 
         print(time.time()-start)
+
+        print("spatial_conflicts")
+        spatial_conflicts_results = helpers_evaluation.spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_profiles,pixel_meter_ratios)
+        print(time.time()-start)
+        helpers_evaluation.convert_losses(losses,"spatial_",spatial_conflicts_results)
         
         
         # print(spatial_conflicts_results)

@@ -1,8 +1,8 @@
 {
 
-    "model":"rnn_mlp",
+    "model":"spatial_attention",
     "set_type_train": "train",
-    "set_type_test": "eval",
+    "set_type_test": "test",
     "load_path" : "",  
 
     "train":1,

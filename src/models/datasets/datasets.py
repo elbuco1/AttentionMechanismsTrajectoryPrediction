@@ -270,9 +270,9 @@ class Hdf5Dataset():
       def __load_images(self):#cuda
             images = {}
             print("loading images features")
-            cnn = customCNN1()
-            cnn.eval()
-            cnn = cnn.cuda()
+            # cnn = customCNN1()
+            # cnn.eval()
+            # cnn = cnn.cuda()
             paddings = self.__get_paddings()
             for scene,pad in zip(self.scene_list,paddings):
                   img = Image.open(self.images_path.format(scene))
@@ -282,14 +282,20 @@ class Hdf5Dataset():
                         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                   ])
 
+                  cnn = customCNN1()
+                  cnn.eval()
+                  # cnn = cnn.cuda()
+
                   img = transform(img)
-                  img = img.cuda()
+                  # img = img.cuda()
                   
                   img = img.unsqueeze(0)
                   img = cnn(img)
                   img = img.squeeze(0)
 
-                  img = img.cpu()
+                  # img = img.cpu()
+                  # cnn = cnn.cpu()
+
                   images[scene] = img
                   
 

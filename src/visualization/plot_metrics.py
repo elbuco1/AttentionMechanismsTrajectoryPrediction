@@ -94,7 +94,29 @@ def main():
     plt.close()
 
     
-          
+    fig, ax = plt.subplots()
+
+    spatial = []
+    models = []
+    for model in models_list:
+        losses = json.load(open(dir_name.format(model)+"losses.json"))
+        spatial.append(losses["global"]["spatial_pred"])
+        models.append("")
+    spatials = np.array([models,spatial])
+
+    i = 0
+    for x,y,model in zip(spatials[0,:],spatials[1,:],models_list):
+        ax.bar(i,y,label = model)
+        i+=1
+    ax.set_title('Spatial metrics')
+    ax.set(xlabel='Models', ylabel='Spatial conflicts proportion')
+    ax.legend()
+
+    fig.tight_layout()
+    plt.savefig(save_dir+"spatial_losses.png")
+    plt.close()
+
+
 
 
 if __name__ == "__main__":

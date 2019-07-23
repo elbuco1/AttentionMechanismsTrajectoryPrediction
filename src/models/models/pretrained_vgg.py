@@ -40,3 +40,15 @@ class customCNN1(nn.Module):
 
         cnn_features = self.reduce_layer(x)
         return cnn_features
+class customCNN2(nn.Module):
+    def __init__(self,device, nb_channels_out = 1280,nb_channels_projection = 128): #mobilenet
+    # def __init__(self,device, nb_channels_out = 512,nb_channels_projection = 128): #vgg19
+    # def __init__(self,device, nb_channels_out = 2048,nb_channels_projection = 128): #segmentation
+
+        super(customCNN2,self).__init__()
+        self.device = device
+        self.nb_channels_out = nb_channels_out   
+        self.projection = nn.Conv2d(nb_channels_out,nb_channels_projection,1)
+    def forward(self,x):
+        projected_features = self.projection(x)
+        return projected_features

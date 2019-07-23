@@ -9,6 +9,8 @@ import os
 
 from models.rnn_mlp import RNN_MLP
 from models.social_attention import SocialAttention
+from models.spatial_attention import SpatialAttention
+
 from models.cnn_mlp import CNN_MLP
 import random
 from classes.training_class import NetTraining
@@ -125,6 +127,38 @@ def main():
         }     
 
         net_type = SocialAttention
+    elif model_name == "spatial_attention":
+        args_net = {
+            "device" : device,
+            "input_dim" : net_params["input_dim"],
+            "input_length" : processed_parameters["t_obs"],
+            "output_length" : processed_parameters["t_pred"],
+            "pred_dim" : processed_parameters["t_pred"] * net_params["input_dim"] ,
+            
+            "dmodel" : net_params["dmodel"],
+            "predictor_layers" : net_params["predictor_layers"],
+            "nb_conv": net_params["nb_conv"],
+            "nb_kernel": net_params["nb_kernel"],
+            "cnn_feat_size": net_params["cnn_feat_size"],
+            "kernel_size" : net_params["kernel_size"],
+
+            "dropout_tfr" : net_params["dropout_tfr"],
+            "projection_layers":net_params["projection_layers"],
+            "spatial_projection":net_params["spatial_projection"],
+            "vgg_feature_size":net_params["vgg_feature_size"],
+
+
+             
+            "model_name":model_name,
+            "use_images":net_params["use_images"],
+            "use_neighbors":net_params["use_neighbors"],
+            "offsets":training_parameters["offsets"],
+            "offsets_input" : training_parameters["offsets_input"],
+
+        }
+        
+
+        net_type = SpatialAttention
     
         
     # init neural network

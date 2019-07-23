@@ -122,7 +122,7 @@ def get_active_mask(mask_target):
         active_mask.append(torch.LongTensor(ids))
     return active_mask
 
-def get_data_loader(data_file,scene,args_net,prepare_param,eval_params):
+def get_data_loader(parameters_project,data_file,scene,args_net,prepare_param,eval_params):
     
     dataset = Hdf5Dataset(
         hdf5_file= data_file,
@@ -136,7 +136,9 @@ def get_data_loader(data_file,scene,args_net,prepare_param,eval_params):
         predict_offsets = args_net["offsets"],
         offsets_input = args_net["offsets_input"],
         padding = prepare_param["padding"],
-        evaluation = 1
+        evaluation = 1,
+        use_images = args_net["use_images"],
+        images_path = parameters_project["raw_images"]
         )
 
     data_loader = CustomDataLoader( batch_size = eval_params["batch_size"],shuffle = False,drop_last = False,dataset = dataset,test=0)
@@ -147,71 +149,71 @@ def get_data_loader(data_file,scene,args_net,prepare_param,eval_params):
 #    Counts the number of problematic interaction
 #    averages the percentage over all timesteps
 #    returns conflicts coordinates without specifying their timestep
-def conflicts(output,threshold = 0.5):
-    timesteps = []
-    timesteps_disjoint = []
+# def conflicts(output,threshold = 0.5):
+#     timesteps = []
+#     timesteps_disjoint = []
 
-    conflict_points = np.array([])
-    for t in range(output.shape[1]):
-        points = np.array(output[:,t])
-        d = distance_matrix(points,points)
+#     conflict_points = np.array([])
+#     for t in range(output.shape[1]):
+#         points = np.array(output[:,t])
+#         d = distance_matrix(points,points)
 
-        m = (d < threshold).astype(int) - np.eye(len(points))
-        total_count = np.ones_like(m)
-        m = np.triu(m,1)
-        total_count = np.triu(total_count,1)
+#         m = (d < threshold).astype(int) - np.eye(len(points))
+#         total_count = np.ones_like(m)
+#         m = np.triu(m,1)
+#         total_count = np.triu(total_count,1)
 
-        # disjoint (only first trajectory)
-        if float(total_count[0].sum()) > 0.:
-            conflict_prop_disjoint = m[0].sum() / float(total_count[0].sum())
-        else:
-            conflict_prop_disjoint = 0
-        # joint
-        if float(total_count.sum()) > 0.:           
-            conflict_prop = m.sum() / float(total_count.sum())
-        else:
-            conflict_prop = 0
+#         # disjoint (only first trajectory)
+#         if float(total_count[0].sum()) > 0.:
+#             conflict_prop_disjoint = m[0].sum() / float(total_count[0].sum())
+#         else:
+#             conflict_prop_disjoint = 0
+#         # joint
+#         if float(total_count.sum()) > 0.:           
+#             conflict_prop = m.sum() / float(total_count.sum())
+#         else:
+#             conflict_prop = 0
 
-        timesteps.append(conflict_prop)
-        timesteps_disjoint.append(conflict_prop_disjoint)
-
-
-        # select points where conflict happens
-        ids = np.unique( np.argwhere(m)[:,0] ) 
-        if len(ids) > 0:
-            points = points[ids]
-            if len(conflict_points) > 0:
-                conflict_points = np.concatenate([conflict_points,points], axis = 0)
-            else:
-                conflict_points = points
+#         timesteps.append(conflict_prop)
+#         timesteps_disjoint.append(conflict_prop_disjoint)
 
 
+#         # select points where conflict happens
+#         ids = np.unique( np.argwhere(m)[:,0] ) 
+#         if len(ids) > 0:
+#             points = points[ids]
+#             if len(conflict_points) > 0:
+#                 conflict_points = np.concatenate([conflict_points,points], axis = 0)
+#             else:
+#                 conflict_points = points
 
-    return np.mean(timesteps),np.mean(timesteps_disjoint),timesteps,timesteps_disjoint,conflict_points.tolist()
 
-def dynamic_eval(output,types,dynamics,types_dic,delta_t,dynamic_threshold = 0.0):
-    acc_lhood = []
-    speed_lhood = []
 
-    for a in range(output.shape[0]):
-        coordinates = output[a]
-        type_ = types[a]
-        type_ = types_dic[str(int(type_+1))]
+#     return np.mean(timesteps),np.mean(timesteps_disjoint),timesteps,timesteps_disjoint,conflict_points.tolist()
 
-        speeds = np.array(get_speeds(coordinates,delta_t))
-        accelerations = np.array(get_accelerations(speeds,delta_t))
-        dynamic_type = dynamics[type_]
+# def dynamic_eval(output,types,dynamics,types_dic,delta_t,dynamic_threshold = 0.0):
+#     acc_lhood = []
+#     speed_lhood = []
 
-        acc_props = norm.pdf(accelerations, loc = dynamic_type["accelerations"]["mean"], scale=dynamic_type["accelerations"]["std"]) 
-        speed_props = norm.pdf(accelerations, loc = dynamic_type["speeds"]["mean"], scale=dynamic_type["speeds"]["std"]) 
+#     for a in range(output.shape[0]):
+#         coordinates = output[a]
+#         type_ = types[a]
+#         type_ = types_dic[str(int(type_+1))]
 
-        acc_lhood.append( acc_props)
-        speed_lhood.append(speed_props)
+#         speeds = np.array(get_speeds(coordinates,delta_t))
+#         accelerations = np.array(get_accelerations(speeds,delta_t))
+#         dynamic_type = dynamics[type_]
 
-    acc_lhood_disjoint = acc_lhood[0]
-    speed_lhood_disjoint = speed_lhood[0]
+#         acc_props = norm.pdf(accelerations, loc = dynamic_type["accelerations"]["mean"], scale=dynamic_type["accelerations"]["std"]) 
+#         speed_props = norm.pdf(accelerations, loc = dynamic_type["speeds"]["mean"], scale=dynamic_type["speeds"]["std"]) 
 
-    return acc_lhood,speed_lhood,acc_lhood_disjoint,speed_lhood_disjoint,np.mean(acc_lhood),np.mean(speed_lhood),np.mean(acc_lhood_disjoint),np.mean(speed_lhood_disjoint)
+#         acc_lhood.append( acc_props)
+#         speed_lhood.append(speed_props)
+
+#     acc_lhood_disjoint = acc_lhood[0]
+#     speed_lhood_disjoint = speed_lhood[0]
+
+#     return acc_lhood,speed_lhood,acc_lhood_disjoint,speed_lhood_disjoint,np.mean(acc_lhood),np.mean(speed_lhood),np.mean(acc_lhood_disjoint),np.mean(speed_lhood_disjoint)
 
 
 def get_speed(point1,point2,deltat):
@@ -274,15 +276,15 @@ def scene_mask(scene,img_path,annotations_path,spatial_profiles):
         
         return masks
 
-def spatial_conflicts(mask,trajectory_p):
-        ctr = 0
-        # print(mask.shape)
-        for point in trajectory_p:
-                #case out of frame
-                if point[1] in range(0,mask.shape[0]) and point[0] in range(0,mask.shape[1]):
-                    if mask[point[1],point[0]]:
-                            ctr += 1
-        return ctr / float(len(trajectory_p))
+# def spatial_conflicts(mask,trajectory_p):
+#         ctr = 0
+#         # print(mask.shape)
+#         for point in trajectory_p:
+#                 #case out of frame
+#                 if point[1] in range(0,mask.shape[0]) and point[0] in range(0,mask.shape[1]):
+#                     if mask[point[1],point[0]]:
+#                             ctr += 1
+#         return ctr / float(len(trajectory_p))
 
 # def spatial_conflicts(mask,trajectory_p):
 #         ctr = 0
@@ -296,14 +298,14 @@ def spatial_conflicts(mask,trajectory_p):
                     
 #         return frame_conflicts
 
-def spatial_loss(spatial_profile_ids,spatial_masks,outputs,pixel2meters):
-    spatial_losses = []
-    for id_,trajectory_p in zip(spatial_profile_ids,outputs):
-        trajectory_p *= pixel2meters
-        trajectory_p = trajectory_p.astype(np.int32)
-        res = spatial_conflicts(spatial_masks[id_],trajectory_p)
-        spatial_losses.append(res)
-    return spatial_losses[0], np.mean(spatial_losses)
+# def spatial_loss(spatial_profile_ids,spatial_masks,outputs,pixel2meters):
+#     spatial_losses = []
+#     for id_,trajectory_p in zip(spatial_profile_ids,outputs):
+#         trajectory_p *= pixel2meters
+#         trajectory_p = trajectory_p.astype(np.int32)
+#         res = spatial_conflicts(spatial_masks[id_],trajectory_p)
+#         spatial_losses.append(res)
+#     return spatial_losses[0], np.mean(spatial_losses)
 
 # def spatial_loss(spatial_profile_ids,spatial_masks,outputs,pixel2meters):
 #     spatial_losses = []
@@ -332,20 +334,20 @@ def spatial_loss(spatial_profile_ids,spatial_masks,outputs,pixel2meters):
 #     points = np.array(output[:,t])
 
 
-def get_factor(scene,correspondences_trajnet,correspondences_manual):
-    if scene in correspondences_trajnet:
-        row = correspondences_trajnet[scene]
-        pixel2meter_ratio = row["pixel2meter"]
-        meter2pixel_ratio = 1/pixel2meter_ratio
-    else:
-        row = correspondences_manual[scene]
-        meter_dist = row["meter_distance"]
-        pixel_coord = row["pixel_coordinates"]
-        pixel_dist = euclidean(pixel_coord[0],pixel_coord[1])
-        pixel2meter_ratio = meter_dist/float(pixel_dist)
-        meter2pixel_ratio = float(pixel_dist)/meter_dist
+# def get_factor(scene,correspondences_trajnet,correspondences_manual):
+#     if scene in correspondences_trajnet:
+#         row = correspondences_trajnet[scene]
+#         pixel2meter_ratio = row["pixel2meter"]
+#         meter2pixel_ratio = 1/pixel2meter_ratio
+#     else:
+#         row = correspondences_manual[scene]
+#         meter_dist = row["meter_distance"]
+#         pixel_coord = row["pixel_coordinates"]
+#         pixel_dist = euclidean(pixel_coord[0],pixel_coord[1])
+#         pixel2meter_ratio = meter_dist/float(pixel_dist)
+#         meter2pixel_ratio = float(pixel_dist)/meter_dist
 
-    return meter2pixel_ratio
+#     return meter2pixel_ratio
 
 
 def predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device):
@@ -410,17 +412,19 @@ def predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device):
     outputs = outputs.view(b,n,p,i)
     return outputs,inputs,types,active_mask,points_mask
         
-def predict_naive(inputs,types,active_mask,points_mask,net,device):
+def predict_naive(inputs,types,active_mask,points_mask,net,device,imgs):
     b,n,s,i = points_mask[0].shape
     b,n,p,i = points_mask[1].shape
 
     inputs = inputs.view(-1,s,i).unsqueeze(1)
+    imgs = imgs.repeat(inputs.size()[0],1,1,1)
+
     types = types.view(-1).unsqueeze(1)
     points_mask[0] = np.expand_dims(points_mask[0].reshape(-1,s,i),1)
     points_mask[1] = np.expand_dims(points_mask[1].reshape(-1,p,i),1)
     
     # prediction
-    outputs = net((inputs,types,active_mask,points_mask))
+    outputs = net((inputs,types,active_mask,points_mask,imgs))
 
     # b*n,s,i -> b,n,s,i
     outputs = outputs.squeeze(1).view(b,n,p,i)
@@ -472,7 +476,7 @@ def apply_criterion(criterion,scene_files):
     results["global"]["disjoint"] = np.mean(results["global"]["disjoint"])
     return results
             
-def spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_profiles,correspondences_trajnet,correspondences_manual):
+def spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_profiles,pixel_meter_ratios):
     nb_sample = 0
     spatial_conflicts_results = { "global": {"groundtruth":0,"pred":0}}
     for scene_file in scene_files:
@@ -485,7 +489,8 @@ def spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_prof
         #compute mask for spatial structure
         spatial_masks = scene_mask(scene,images,spatial_annotations,spatial_profiles)
         #get rtio for meter to pixel conversion
-        meters_to_pixel = get_factor(scene,correspondences_trajnet,correspondences_manual)
+        meters_to_pixel = 1.0/pixel_meter_ratios[scene]
+        # 1.0/ self.pixel_meter_ratios[self.scene]
 
         # print(scene)
         nb_sample_scene = 0
@@ -524,6 +529,8 @@ def spatial_conflicts(mask,trajectory_p):
             if mask[int(point[0]),int(point[1])]:
                     ctr += 1
     return ctr
+
+
 
 # def spatial_loss(spatial_mask,trajectory,meters_to_pixel):
 #     trajectory *= meters_to_pixel

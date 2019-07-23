@@ -1,0 +1,29 @@
+{
+    "input_dim":2,
+    "dmodel":32,
+    "dropout_tfr" : 0,
+    
+    
+    "predictor_layers": [100],
+    
+
+    "spatial_projection": 512,
+    "vgg_feature_size": 512,
+    
+    
+    "nb_conv":2,
+    "nb_kernel":128,
+    "cnn_feat_size":256,
+    "kernel_size":5,
+    
+    "projection_layers":[128, 256, 128, 64],
+    
+    "use_neighbors": 0,
+    "use_images": 1
+
+ 
+    
+
+ 
+ 
+}
