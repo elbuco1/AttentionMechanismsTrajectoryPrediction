@@ -6,7 +6,8 @@
         "rnn_mlp",
         "cnn_mlp",
         "social_attention",
-        "spatial_attention"
+        "spatial_attention",
+        "spatial_abs"
     ],
     "metrics":[
         "ade_disjoint",

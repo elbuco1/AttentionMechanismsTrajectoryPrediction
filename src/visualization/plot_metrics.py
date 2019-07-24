@@ -100,7 +100,7 @@ def main():
     models = []
     for model in models_list:
         losses = json.load(open(dir_name.format(model)+"losses.json"))
-        spatial.append(losses["global"]["spatial_pred"])
+        spatial.append(losses["global"]["spatial_pred"]*100)
         models.append("")
     spatials = np.array([models,spatial])
 

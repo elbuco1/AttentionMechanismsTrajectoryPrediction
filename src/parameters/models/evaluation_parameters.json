@@ -1,7 +1,7 @@
 {
     "batch_size":1,
-    "model_name":"social_attention",
-    "report_name":"social_attention",
+    "model_name":"spatial_attention",
+    "report_name":"spatial_attention",
     "set_type_test":"test",
     "spatial_annotations": "./data/external/spatial_annotations/",
     "user_spatial_profile":{

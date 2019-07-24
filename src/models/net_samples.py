@@ -140,6 +140,8 @@ def main():
             labels = torch.mul(points_mask,labels) # bon endroit?
             # active mask per sample in batch
 
+            if not args_net["offsets"]:
+                target_last = np.zeros_like(labels.detach().cpu().numpy())
 
             for i,l,o,t,p, a, il, tl  in zip(inputs, labels, outputs, types, points_mask,active_mask, input_last, target_last):
 

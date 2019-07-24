@@ -298,17 +298,21 @@ class NetTraining():
         return eval_loss,fde,ade
 
     def plot_losses(self,losses,idx,root):
-        plt.plot(losses["train"]["loss"],label = "train_loss")
-        plt.plot(losses["eval"]["loss"],label = "eval_loss")
-        plt.legend()
+        fig,ax = plt.subplot()
+        ax.plot(losses["train"]["loss"],label = "train_loss")
+        ax.plot(losses["eval"]["loss"],label = "eval_loss")
+        ax.legend()
 
         # plt.show()
+        fig.tight_layout()
         plt.savefig("{}losses_{}.jpg".format(root,idx))
         plt.close()
 
-        plt.plot(losses["eval"]["ade"],label = "ade")
-        plt.plot(losses["eval"]["fde"],label = "fde")
-        plt.legend()
+        fig,ax = plt.subplot()
+        ax.plot(losses["eval"]["ade"],label = "ade")
+        ax.plot(losses["eval"]["fde"],label = "fde")
+        ax.legend()
+        fig.tight_layout()
 
         plt.savefig("{}ade_fde_{}.jpg".format(root,idx))
         plt.close()

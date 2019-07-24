@@ -209,6 +209,7 @@ def plot_grad_flow(named_parameters,epoch,root = "./data/reports/gradients/"):
                 Line2D([0], [0], color="k", lw=4)], ['max-gradient', 'mean-gradient', 'zero-gradient'])
 
     # plt.savefig("{}gradients_{}.jpg".format(root,epoch), bbox_extra_artists=(lgd,), bbox_inches='tight')
+    fig.tight_layout()
     plt.savefig("{}gradients_{}.jpg".format(root,time.time()), bbox_extra_artists=(lgd,), bbox_inches='tight')
 
     plt.close()

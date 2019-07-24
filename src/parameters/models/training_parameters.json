@@ -3,14 +3,14 @@
     "model":"spatial_attention",
     "set_type_train": "train",
     "set_type_test": "test",
-    "load_path" : "",  
+    "load_path" : "./models/training/model_9.tar",  
 
     "train":1,
     "test":0,
    
     "unjoint_optimisation":1,
 
-    "n_epochs" : 10,
+    "n_epochs" : 20,
     "batch_size": 32 ,    
     "lr" : 0.0001, 
 
@@ -22,6 +22,6 @@
     "nb_grad_plots":1,
 
 
-    "offsets":1,
+    "offsets":0,
     "offsets_input":0
 }
