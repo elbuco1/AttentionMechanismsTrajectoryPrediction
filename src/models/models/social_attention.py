@@ -11,8 +11,10 @@ from models.cnn import CNN
 # from classes.transformer import Transformer,MultiHeadAttention
 # from classes.tcn import TemporalConvNet
 
-from models.soft_attention import SoftAttention
-from models.soft_attention import MultiHeadAttention
+# from models.soft_attention import SoftAttention
+# from models.soft_attention import MultiHeadAttention
+
+import models.soft_attention as soft_attention
 
 
 
@@ -79,9 +81,9 @@ class SocialAttention(nn.Module):
         self.conv2pred = nn.Linear(self.cnn_feat_size,self.dmodel)
 
         if self.use_mha:
-            self.soft = MultiheadAttention(self.dmodel,self.h,self.mha_dropout)
+            self.soft = soft_attention.MultiHeadAttention(self.device,self.dmodel,self.h,self.mha_dropout)
         else:
-            self.soft = SoftAttention(self.device,self.dmodel,self.projection_layers,self.mha_dropout)
+            self.soft = soft_attention.SoftAttention(self.device,self.dmodel,self.projection_layers,self.mha_dropout)
 
 ############# Predictor #########################################
 
@@ -132,7 +134,7 @@ class SocialAttention(nn.Module):
         x = f.relu(x)
 
 
-        att_feat = self.soft(x,x,x,points_mask, self.joint_optimisation)# B,Nmax,dmodel
+        att_feat = self.soft(x.clone(),x.clone(),x.clone(),points_mask, self.joint_optimisation)# B,Nmax,dmodel
         if not self.joint_optimisation:
             conv_features = conv_features[:,0].unsqueeze(1)
 
