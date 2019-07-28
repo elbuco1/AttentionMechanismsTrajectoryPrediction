@@ -115,14 +115,19 @@ def main():
             "cnn_feat_size": net_params["cnn_feat_size"],
             "kernel_size" : net_params["kernel_size"],
             
-            "dropout_tfr" : net_params["dropout_tfr"],
+            # "dropout_tfr" : net_params["dropout_tfr"],
             "projection_layers":net_params["projection_layers"],
             
             "use_images":net_params["use_images"],
             "use_neighbors":net_params["use_neighbors"],
             "offsets":training_parameters["offsets"],
             "offsets_input" : training_parameters["offsets_input"],
-            "model_name":model_name
+            "model_name":model_name,
+            "use_mha": net_params["use_mha"],
+            "h": net_params["h"],
+            "mha_dropout": net_params["mha_dropout"],
+            "joint_optimisation": training_parameters["joint_optimisation"]
+
 
         }     
 
@@ -190,7 +195,8 @@ def main():
         "train" : training_parameters["train"],
         "gradients_reports": parameters_project["gradients_reports"],
         "losses_reports": parameters_project["losses_reports"],
-        "models_reports": parameters_project["models_reports"]
+        "models_reports": parameters_project["models_reports"],
+        "joint_optimisation": training_parameters["joint_optimisation"]
 
          
     }

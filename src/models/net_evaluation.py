@@ -76,12 +76,9 @@ def main():
         helpers_evaluation.convert_losses(losses,"social_wsstn_",conflicts_distrib_results)
 
        
-            
-        # print(conflicts_distrib_results)
-        # print(time.time()-start)
-
         print("social_conflicts")
-        social_results = helpers_evaluation.social_conflicts(scene_files)
+        conflict_threshold = evaluation_parameters["conflict_thresholds"]
+        social_results = helpers_evaluation.social_conflicts(scene_files,conflict_threshold)
         helpers_evaluation.convert_losses(losses,"social_",social_results)
 
         print(time.time()-start)
@@ -90,9 +87,21 @@ def main():
         spatial_conflicts_results = helpers_evaluation.spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_profiles,pixel_meter_ratios)
         print(time.time()-start)
         helpers_evaluation.convert_losses(losses,"spatial_",spatial_conflicts_results)
+
+        print("spatial histograms")
+        scenes_dimensions = helpers_evaluation.get_scene_dimensions(scenes, images, pixel_meter_ratios)
+        cell_sizes = evaluation_parameters["cell_sizes"]
+
+        for cell_size in cell_sizes:
+            # print("------ cell size {}".format(cell_size))
+            spatial_hist_results = helpers_evaluation.spatial_hist(scene_files,scenes_dimensions,types_to_spatial,cell_size)
+            helpers_evaluation.convert_losses(losses,"spatial_hist_{}_".format(cell_size),spatial_hist_results)
+        
+        print("spatial distribution")
+        spatial_distrib_results = helpers_evaluation.spatial_distrib(scene_files)
+        helpers_evaluation.convert_losses(losses,"spatial_distrib_",spatial_distrib_results)
         
         
-        # print(spatial_conflicts_results)
         print("ade")        
         results_ade = helpers_evaluation.apply_criterion(helpers_evaluation.ade,scene_files)
         helpers_evaluation.convert_losses(losses,"ade_",results_ade)       
@@ -104,21 +113,7 @@ def main():
         # print(time.time()-start)
 
 
-        print("spatial histograms")
-        scenes_dimensions = helpers_evaluation.get_scene_dimensions(scenes, images, pixel_meter_ratios)
-        print(scenes_dimensions)
-        cell_size = 1
-
-        cell_sizes = [0.5,1,2,5]
-
-        for cell_size in cell_sizes:
-            print("cell size {}".format(cell_size))
-            spatial_hist_results = helpers_evaluation.spatial_hist(scene_files,scenes_dimensions,types_to_spatial,cell_size)
-            helpers_evaluation.convert_losses(losses,"spatial_hist_{}_".format(cell_size),spatial_hist_results)
         
-        
-        spatial_distrib_results = helpers_evaluation.spatial_distrib(scene_files)
-        helpers_evaluation.convert_losses(losses,"spatial_distrib_",spatial_distrib_results)
         
 
         json.dump(losses,open(dir_name + "losses.json","w"),indent=2)

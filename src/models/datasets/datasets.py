@@ -107,7 +107,9 @@ class Hdf5Dataset():
 
             self.shape = self.coord_dset.shape
             if self.use_images:
+                  # self.images = self.__load_images1()
                   self.images = self.__load_images()
+
             
       def __del__(self):
             self.hdf5_file.close()

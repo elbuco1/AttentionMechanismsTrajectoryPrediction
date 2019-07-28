@@ -1,18 +1,16 @@
 {
     
-    "load_path" : "",    
-    
+        
     "input_dim":2,
 
     "dmodel":128,
-    "dropout_tfr" : 0.1,
+    "mha_dropout" : 0.1,
     "h":4,
+    "use_mha":0,
     
     
     "predictor_layers": [100,100],
     
-
-    "coordinates_embedding_size":0,
     "nb_conv":2,
     "nb_kernel":32,
     "cnn_feat_size":256,
@@ -20,30 +18,14 @@
     
     
     "projection_layers":[128,64],
-    "use_mha":0,
+    
 
     "use_neighbors": 1,
-    "use_images": 0,
+    "use_images": 0
+    
 
 
 
-    "hyperparameters":{
-        "lr" : [0.001,0.0001],
-        "s" : [6],
-        "batch_size":[8,16,32],
-        "offsets": [0,1],
-        "offsets_input":[0],
-        "normalize":[0,1],
-        "coordinates_embedding_size":[0,32],
-        "nb_kernel":[32,128],
-        "kernel_size":[3,5],
-        "cnn_feat_size":[128,256],
-        "nb_conv":[2,4],
-        "use_mha":[1],
-        "predictor_layers":[[100],[100,100]],
-        "dmodel":[32,128],
-        "dropout_tfr" : [0,0.1],
-        "h":[1,4]     }
  
  
  

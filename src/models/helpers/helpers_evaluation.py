@@ -327,7 +327,7 @@ def apply_criterion(criterion,scene_files):
     return results
 
 
-def spatial_distrib(scene_files):
+def spatial_distrib(scene_files, use_inputs = 1):
     
     spatial_conflicts_results = {}
     for scene_file in scene_files:
@@ -343,10 +343,15 @@ def spatial_distrib(scene_files):
             sample = scene_file[sample]
             label = sample["labels"][0]
             output = sample["outputs"][0]
+            inputs = sample["inputs"][0]
+
             type_ = sample["types"][0]
 
             labels += label
             outputs += output
+
+            if use_inputs:
+                labels += inputs
         spatial_conflicts_results[scene]["distance"] = emd_samples(labels,outputs)        
 
     global_ = []
@@ -360,12 +365,11 @@ def spatial_distrib(scene_files):
         
 
 
-def spatial_hist(scene_files,scenes_dimensions, types_to_spatial, cell_size):
+def spatial_hist(scene_files,scenes_dimensions, types_to_spatial, cell_size, use_inputs = 1):
     
     spatial_conflicts_results = {}
     for scene_file in scene_files:
         scene = scene_file.split("/")[-1].split(".")[0].split("_")[0]
-        print(scene)
         spatial_conflicts_results[scene] = 0
 
         scene_file = json.load(open(scene_file))
@@ -380,6 +384,8 @@ def spatial_hist(scene_files,scenes_dimensions, types_to_spatial, cell_size):
             sample = scene_file[sample]
             label = sample["labels"][0]
             output = sample["outputs"][0]
+            inputs = sample["inputs"][0]
+
             type_ = sample["types"][0]
 
             
@@ -388,6 +394,11 @@ def spatial_hist(scene_files,scenes_dimensions, types_to_spatial, cell_size):
             for p_label, p_output in zip(label, output):
                 grid_label = fill_grid(p_label, grid_label, cell_size)
                 grid_output = fill_grid(p_output, grid_output, cell_size)
+
+            if use_inputs:
+                for p_input in inputs:
+                    grid_label = fill_grid(p_input, grid_label, cell_size)
+
        
         grid_label = grid_label.flatten()
         grid_output = grid_output.flatten()
@@ -455,7 +466,6 @@ def get_scene_dimensions(scenes,images,pixel_meter_ratios):
         pixel_meter_ratio = pixel_meter_ratios[scene]
         img_path = images.format(scene)
         img = np.array(cv2.imread(img_path))
-        print(img.shape)
         h,w,_ = img.shape 
         h,w = get_scene_dimension(h,w,pixel_meter_ratio)
         h = cut_decimals(h)
@@ -518,11 +528,8 @@ def spatial_conflicts(mask,trajectory_p):
                     ctr += 1
     return ctr
 
-
-
-def social_conflicts(scene_files):
+def social_conflicts(scene_files, conflict_thresholds):
     social_results = {}
-    conflict_thresholds = [0.1,0.5,1.0]
     social_results["global"] = {}
     for thresh in conflict_thresholds:
         social_results["global"]["joint_"+str(thresh)] = []
@@ -576,6 +583,7 @@ def social_conflicts(scene_files):
         social_results["global"]["disjoint_"+str(thresh)] = np.mean(social_results["global"]["disjoint_"+str(thresh)])
         social_results["global"]["groundtruth_"+str(thresh)] = np.mean(social_results["global"]["groundtruth_"+str(thresh)])
     return social_results
+
 
                     
 

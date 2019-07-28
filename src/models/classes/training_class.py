@@ -38,6 +38,7 @@ class NetTraining():
         self.gradient_reports = args["gradients_reports"]
         self.losses_reports = args["losses_reports"]
         self.models_reports = args["models_reports"]
+        self.joint_optimisation = args["joint_optimisation"]
 
 
 
@@ -62,46 +63,46 @@ class NetTraining():
             losses = checkpoint["losses"]
             start_epoch = checkpoint["epoch"]
 
-        try:
-            best_harmonic_fde_ade = float('inf')
-            best_ade = 0
-            best_fde = 0
-            
-            # iterations
-            for epoch in range(start_epoch,self.n_epochs):
-                train_loss = 0.
-                # train model
-                if self.train_model:
-                    train_loss,_ = self.train(epoch)
-                # eval model
-                eval_loss,fde,ade = self.evaluate(epoch)                   
-                
-                # store losses
-                losses["train"]["loss"].append(train_loss)
-                losses["eval"]["loss"].append(eval_loss)
-                losses["eval"]["ade"].append(ade)
-                losses["eval"]["fde"].append(fde)
-
-                # display losses graphs
-                if self.plot and epoch % self.plot_every == 0:
-                    self.plot_losses(losses,s,root = self.losses_reports)
-
-                # save model regularly
-                if epoch % self.save_every == 0:
-                    self.save_model(epoch,epoch,self.net,self.optimizer,losses,save_root= self.models_reports)
-
-                h = stats.hmean([ade,fde])
-
-                # if new best model save it
-                if h < best_harmonic_fde_ade:
-                    print("harmonic mean {} is better than {}, saving new best model!".format(h,best_harmonic_fde_ade))
-                    self.save_model(epoch,"best",self.net,self.optimizer,losses,remove=0 ,save_root= self.models_reports)
-                    best_harmonic_fde_ade = h
-                    best_ade = ade
-                    best_fde = fde
+        # try:
+        best_harmonic_fde_ade = float('inf')
+        best_ade = 0
+        best_fde = 0
         
-        except Exception as e: 
-            print(e)
+        # iterations
+        for epoch in range(start_epoch,self.n_epochs):
+            train_loss = 0.
+            # train model
+            if self.train_model:
+                train_loss,_ = self.train(epoch)
+            # eval model
+            eval_loss,fde,ade = self.evaluate(epoch)                   
+            
+            # store losses
+            losses["train"]["loss"].append(train_loss)
+            losses["eval"]["loss"].append(eval_loss)
+            losses["eval"]["ade"].append(ade)
+            losses["eval"]["fde"].append(fde)
+
+            # display losses graphs
+            if self.plot and epoch % self.plot_every == 0:
+                self.plot_losses(losses,s,root = self.losses_reports)
+
+            # save model regularly
+            if epoch % self.save_every == 0:
+                self.save_model(epoch,epoch,self.net,self.optimizer,losses,save_root= self.models_reports)
+
+            h = stats.hmean([ade,fde])
+
+            # if new best model save it
+            if h < best_harmonic_fde_ade:
+                print("harmonic mean {} is better than {}, saving new best model!".format(h,best_harmonic_fde_ade))
+                self.save_model(epoch,"best",self.net,self.optimizer,losses,remove=0 ,save_root= self.models_reports)
+                best_harmonic_fde_ade = h
+                best_ade = ade
+                best_fde = fde
+        
+        # except Exception as e: 
+        #     print(e)
 
    
         return best_harmonic_fde_ade,best_ade,best_fde
@@ -149,6 +150,12 @@ class NetTraining():
             # keep mask for prediction part only
             points_mask = points_mask[1]
             points_mask = torch.FloatTensor(points_mask).to(self.device).detach()
+
+
+            if self.use_neighbors and not self.joint_optimisation:
+                points_mask = points_mask[:,0].unsqueeze(1)
+                labels = labels[:,0].unsqueeze(1)
+
 
             
             # compute loss and backprop
@@ -213,7 +220,14 @@ class NetTraining():
             imgs =  imgs.to(self.device)        
             
             outputs = self.net((inputs.clone(),types,active_mask,points_mask,imgs))
-            
+            points_mask = points_mask[1]
+            points_mask = torch.FloatTensor(points_mask).to(self.device)#
+
+            if self.use_neighbors and not self.joint_optimisation:
+                points_mask = points_mask[:,0].unsqueeze(1)
+                labels = labels[:,0].unsqueeze(1)
+                target_last = np.expand_dims(target_last[:,0],1)
+
          
             
             # if relative positions used as inputs or outputs, set them back to absolute
@@ -226,8 +240,7 @@ class NetTraining():
             
 
             # we don't count the prediction error for end of trajectory padding
-            points_mask = points_mask[1]
-            points_mask = torch.FloatTensor(points_mask).to(self.device)#
+            
             loss = self.criterion(outputs.clone(), labels.clone(),points_mask.clone())
             batch_losses.append(loss.item())
 

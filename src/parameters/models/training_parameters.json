@@ -1,6 +1,6 @@
 {
 
-    "model":"cnn_mlp",
+    "model":"social_attention",
     "set_type_train": "train",
     "set_type_test": "eval",
     "load_path" : "",  
@@ -24,5 +24,6 @@
 
 
     "offsets":1,
-    "offsets_input":0
+    "offsets_input":0,
+    "joint_optimisation":0
 }

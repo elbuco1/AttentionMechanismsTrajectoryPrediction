@@ -4,7 +4,6 @@ import torch.nn.functional as f
 import random
 import numpy as np 
 import torchvision
-import imp
 import time
 from models.cnn import CNN
 
@@ -13,6 +12,7 @@ from models.cnn import CNN
 # from classes.tcn import TemporalConvNet
 
 from models.soft_attention import SoftAttention
+from models.soft_attention import MultiHeadAttention
 
 
 
@@ -33,7 +33,7 @@ class SocialAttention(nn.Module):
         self.dmodel =  args["dmodel"]
         
         self.predictor_layers =  args["predictor_layers"]
-        self.dropout_tfr =  args["dropout_tfr"]
+        # self.dropout_tfr =  args["dropout_tfr"]
 
 
         # self.convnet_nb_layers =  args["convnet_nb_layers"]
@@ -47,6 +47,11 @@ class SocialAttention(nn.Module):
 
         #prediction layers
         self.projection_layers = args["projection_layers"]
+
+        self.use_mha = args["use_mha"]
+        self.h = args["h"]
+        self.mha_dropout = args["mha_dropout"]
+        self.joint_optimisation = args["joint_optimisation"]
         
 
 
@@ -73,8 +78,10 @@ class SocialAttention(nn.Module):
         # self.conv2pred = nn.Linear(self.input_length*self.convnet_embedding,self.dmodel)
         self.conv2pred = nn.Linear(self.cnn_feat_size,self.dmodel)
 
-
-        self.soft = SoftAttention(self.device,self.dmodel,self.projection_layers,self.dropout_tfr)
+        if self.use_mha:
+            self.soft = MultiheadAttention(self.dmodel,self.h,self.mha_dropout)
+        else:
+            self.soft = SoftAttention(self.device,self.dmodel,self.projection_layers,self.mha_dropout)
 
 ############# Predictor #########################################
 
@@ -123,7 +130,12 @@ class SocialAttention(nn.Module):
 
         x = self.conv2att(conv_features) # B,Nmax,dmodel    
         x = f.relu(x)
-        att_feat = self.soft(x,x,x,points_mask)# B,Nmax,dmodel
+
+
+        att_feat = self.soft(x,x,x,points_mask, self.joint_optimisation)# B,Nmax,dmodel
+        if not self.joint_optimisation:
+            conv_features = conv_features[:,0].unsqueeze(1)
+
 
 
         # conv_features = self.conv2pred(conv_features)
@@ -142,7 +154,12 @@ class SocialAttention(nn.Module):
 
         t_pred = int(self.pred_dim/float(self.input_dim))
         # print(t_pred,self.pred_dim,self.input_dim)
-        y = y.view(B,Nmax,t_pred,self.input_dim) #B,Nmax,Tpred,Nfeat
+
+        if self.joint_optimisation:
+            y = y.view(B,Nmax,t_pred,self.input_dim) #B,Nmax,Tpred,Nfeat
+        else:
+            y = y.view(B,1,t_pred,self.input_dim) #B,Nmax,Tpred,Nfeat
+
 
         return y
 

@@ -70,13 +70,13 @@ class MaskedLoss(nn.Module):
         super(MaskedLoss, self).__init__()
         self.criterion = criterion
 
-    def forward(self, outputs, targets, mask = None, first_only = 1):
+    def forward(self, outputs, targets, mask = None):
 
         if mask is None:
             mask = torch.ones_like(targets)
         
-        if first_only:
-            mask[:,1:,:,:] = 0
+        # if first_only:
+        #     mask[:,1:,:,:] = 0
         
         loss =  self.criterion(outputs*mask, targets*mask)
         
@@ -89,13 +89,12 @@ class MaskedLoss(nn.Module):
         return loss    
 
 
-def ade_loss(outputs,targets,mask = None,first_only = 1):
+def ade_loss(outputs,targets,mask = None):
 
     if mask is None:
         mask = torch.ones_like(targets)
 
-    if first_only:
-        mask[:,1:,:,:] = 0
+    
 
     # if mask is not None:
     outputs,targets = outputs*mask, targets*mask
@@ -116,13 +115,12 @@ def ade_loss(outputs,targets,mask = None,first_only = 1):
 
     return mse_loss
 
-def fde_loss(outputs,targets,mask,first_only = 0):
+def fde_loss(outputs,targets,mask):
 
     if mask is None:
         mask = torch.ones_like(targets)
 
-    if first_only:
-        mask[:,1:,:,:] = 0
+   
 
     # if mask is not None:
     outputs,targets = outputs*mask, targets*mask

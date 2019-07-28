@@ -17,6 +17,8 @@
         "obstacle_ped":0,
         "obstacle_car":1,
         "obstacle_bicycle":2
-    }
+    },
+    "conflict_thresholds":[0.1,0.5,1.0],
+    "cell_sizes" : [0.5,1,2,5]
 
 }

@@ -50,27 +50,10 @@ class LinearProjection(nn.Module):
         # matmul
         att = torch.bmm(weights,v) # B,Nq,Nk * B,Nk,dmodel -> B,Nq,dmodel
         return att
+    
+    
 
-    def get_mask(self,points_mask,max_batch):
-        # compute mask put one where the dot product conv_features*conv_features.T is 0.
-        # and the sum over a given row of the resulting matrice is gt 1
-        # Nmax = q.size()[1]
-        # dot = torch.bmm(q, torch.transpose(k,2,1))
-        # mask = (dot == 0) & (torch.sum(dot,dim = 1) > 0.).unsqueeze(2).repeat(1,1,Nmax)
-        # mask = mask.to(self.device)
-        # return mask
-        if max_batch == 1:
-            points_mask = np.expand_dims(points_mask, axis = 1)
-
-        sample_sum = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) > 0).astype(int)
-        a = np.repeat(np.expand_dims(sample_sum,axis = 2),max_batch,axis = -1)
-        b = np.transpose(a,axes=(0,2,1))
-        mha_mask = np.logical_and(np.logical_xor(a,b),a).astype(int)
-        # eyes = np.expand_dims(np.eye(mha_mask.shape[-1]),0)
-        # eyes = eyes.repeat(mha_mask.shape[0],0)
-
-        # mha_mask = np.logical_or(mha_mask,eyes).astype(int)
-        return torch.ByteTensor(mha_mask).detach()
+    
         # return torch.ByteTensor(mha_mask).to(self.device)
 
 
@@ -83,12 +66,75 @@ class SoftAttention(nn.Module):
         
         self.mlp_attention = LinearProjection(device,dmodel,self.projection_layers,dropout = dropout)
 
-    def forward(self,q,k,v,points_mask = None):
+    def forward(self,q,k,v,points_mask = None, multiquery = 0):
         if points_mask is not None:
-            mask = self.mlp_attention.get_mask(points_mask,q.size()[1]).to(self.device)
-            att = self.mlp_attention(q,k,v,mask)
+            mask = self.get_mask(points_mask,q.size()[1]).to(self.device)
         else:
-            att = self.mlp_attention(q,k,v)
+            mask = None
+
+        if not multiquery:
+            q = q[:,0].unsqueeze(1)
+        att = self.mlp_attention(q,k,v,mask)
 
 
         return att #B,Nmax,dv
+
+    def get_mask(self,points_mask,max_batch,multiquery = 0):
+        # on met des 1 pour le poids entre un agent actif en ligne et un agent inactif en colonne
+        # pour le cas de l'agent inactif en ligne, peu importe il ne sera pas utilisé pour
+        # la rétropropagation
+        if max_batch == 1:
+            points_mask = np.expand_dims(points_mask, axis = 1)
+
+        sample_sum = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) > 0).astype(int)
+        a = np.repeat(np.expand_dims(sample_sum,axis = 2),max_batch,axis = -1)
+        b = np.transpose(a,axes=(0,2,1))
+        mha_mask = np.logical_and(np.logical_xor(a,b),a).astype(int)
+        # mha_mask = np.logical_xor(a,b).astype(int)
+
+        # eyes = np.expand_dims(np.eye(mha_mask.shape[-1]),0)
+        # eyes = eyes.repeat(mha_mask.shape[0],0)
+
+        # mha_mask = np.logical_or(mha_mask,eyes).astype(int)
+        if not multiquery:
+            mha_mask = np.expand_dims(mha_mask[:,0],1)
+        return torch.ByteTensor(mha_mask).detach()
+
+class MultiHeadAttention(nn.Module):
+    # dk = dv = dmodel/h
+    def __init__(self,device,dmodel,h,mha_dropout):
+        super(MultiHeadAttention,self).__init__()
+        self.device = device
+        self.mha = nn.MultiheadAttention(dmodel,h,mha_dropout)
+
+    def forward(self,q,k,v,points_mask = None, multiquery = 0):
+        if points_mask is not None:
+            mask = self.get_mask(points_mask,q.size()[1]).to(self.device)
+        else:
+            mask = None
+
+        if not multiquery:
+            q = q[:,0].unsqueeze(1)
+        att = self.mha(q,k,v,mask)
+        return att #B,Nmax,dv
+
+    def get_mask(self,points_mask,max_batch,multiquery = 0):
+        # on met des 1 pour le poids entre un agent actif en ligne et un agent inactif en colonne
+        # pour le cas de l'agent inactif en ligne, peu importe il ne sera pas utilisé pour
+        # la rétropropagation
+        if max_batch == 1:
+            points_mask = np.expand_dims(points_mask, axis = 1)
+
+        sample_sum = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) > 0).astype(int)
+        a = np.repeat(np.expand_dims(sample_sum,axis = 2),max_batch,axis = -1)
+        b = np.transpose(a,axes=(0,2,1))
+        mha_mask = np.logical_and(np.logical_xor(a,b),a).astype(int)
+        # mha_mask = np.logical_xor(a,b).astype(int)
+
+        # eyes = np.expand_dims(np.eye(mha_mask.shape[-1]),0)
+        # eyes = eyes.repeat(mha_mask.shape[0],0)
+
+        # mha_mask = np.logical_or(mha_mask,eyes).astype(int)
+        if not multiquery:
+            mha_mask = np.expand_dims(mha_mask[:,0],1)
+        return torch.ByteTensor(mha_mask).detach()
