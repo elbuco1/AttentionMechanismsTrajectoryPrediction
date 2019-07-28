@@ -93,27 +93,49 @@ def main():
     plt.savefig(save_dir+"dynamic_losses.png")
     plt.close()
 
+    # spatial mask
     
     fig, ax = plt.subplots()
 
     spatial = []
-    models = []
     for model in models_list:
         losses = json.load(open(dir_name.format(model)+"losses.json"))
-        spatial.append(losses["global"]["spatial_pred"]*100)
-        models.append("")
-    spatials = np.array([models,spatial])
+        spatial.append(float(losses["global"]["spatial_pred"])*100)
+        
+    
 
-    i = 0
-    for x,y,model in zip(spatials[0,:],spatials[1,:],models_list):
-        ax.bar(i,y,label = model)
-        i+=1
-    ax.set_title('Spatial metrics')
-    ax.set(xlabel='Models', ylabel='Spatial conflicts proportion')
-    ax.legend()
+    pos = np.arange(len(spatial))
+    ax.bar(pos,  spatial )
+    ax.set_xticks( pos)
+    ax.set_xticklabels(models_list)
 
     fig.tight_layout()
     plt.savefig(save_dir+"spatial_losses.png")
+    plt.close()
+
+    # spatial distrib
+
+    fig, ax = plt.subplots()
+
+    spatial = []
+    for model in models_list:
+        losses = json.load(open(dir_name.format(model)+"losses.json"))
+        value = float(losses["global"]["spatial_distrib_distance"])
+        value = int(value * 10 ** 2)/10**2
+        spatial.append(value)
+        
+  
+
+    pos = np.arange(len(spatial))
+    ax.bar(pos,  spatial )
+    ax.set_xticks( pos)
+    ax.set_xticklabels(models_list)
+    ax.set_title('Spatial metrics')
+    ax.set(xlabel='Models', ylabel='Spatial ditribution emd')
+   
+
+    fig.tight_layout()
+    plt.savefig(save_dir+"spatial_distrib_losses.png")
     plt.close()
 
 

@@ -54,9 +54,9 @@ def main():
     types_dic = processed_parameters["types_dic_rev"]
     start = time.time()
     if os.path.exists(dir_name) and os.path.exists(sub_dir_name):
+        scene_files = [ sub_dir_name+f  for f in  os.listdir(sub_dir_name) if "json" in f]
 
         dynamic_losses = {}
-        scene_files = [ sub_dir_name+f  for f in  os.listdir(sub_dir_name) if "json" in f]
         print("speed distribution")
         speed_results = helpers_evaluation.speeds_distance(scene_files,types_dic,1.0/float(raw_parameters["new_framerate"]))
         print(time.time()-start)
@@ -102,10 +102,19 @@ def main():
         helpers_evaluation.convert_losses(losses,"fde_",results_fde)
         print(time.time()-start)
 
+
+        # helpers_evaluation.spatial_distrib(scene_files,types_to_spatial)
+
+        # scenes_dimensions = helpers_evaluation.get_scene_dimensions(scenes, images, pixel_meter_ratios)
+        # print(scenes_dimensions)
+        # cell_size = 1
+        # helpers_evaluation.spatial_distrib(scene_files,scenes_dimensions,types_to_spatial,cell_size)
+
+        spatial_distrib_results = helpers_evaluation.spatial_distrib(scene_files)
+        helpers_evaluation.convert_losses(losses,"spatial_distrib_",spatial_distrib_results)
+        
+
         json.dump(losses,open(dir_name + "losses.json","w"),indent=2)
-
-
-
 
 
 if __name__ == "__main__":

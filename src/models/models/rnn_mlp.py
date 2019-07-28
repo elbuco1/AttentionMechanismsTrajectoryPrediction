@@ -20,6 +20,7 @@ class RNN_MLP(nn.Module):
         self.mlp_layers = args["mlp_layers"]
         self.output_size = args["output_size"]
 
+        # self.encoder = nn.LSTM(input_size = self.input_dim,hidden_size = self.hidden_size,num_layers = self.recurrent_layer,batch_first = True,dropout = 0.1)
         self.encoder = nn.LSTM(input_size = self.input_dim,hidden_size = self.hidden_size,num_layers = self.recurrent_layer,batch_first = True)
 
         self.mlp = nn.Sequential()
@@ -33,6 +34,8 @@ class RNN_MLP(nn.Module):
         for i in range(1,len(self.mlp_layers)):
             self.mlp.add_module("layer{}".format(i),nn.Linear(self.mlp_layers[i-1],self.mlp_layers[i]))
             self.mlp.add_module("relu{}".format(i), nn.ReLU())
+            # self.mlp.add_module("dropout{}".format(i), nn.Dropout(0.1))
+
 
         self.mlp.add_module("layer{}".format(len(self.mlp_layers)), nn.Linear(self.mlp_layers[-1],self.output_size) )
 

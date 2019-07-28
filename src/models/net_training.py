@@ -145,7 +145,6 @@ def main():
             "dropout_tfr" : net_params["dropout_tfr"],
             "projection_layers":net_params["projection_layers"],
             "spatial_projection":net_params["spatial_projection"],
-            "vgg_feature_size":net_params["vgg_feature_size"],
 
 
              
@@ -167,7 +166,7 @@ def main():
     train_loader,eval_loader,_,_ = helpers.load_data_loaders(parameters_project, processed_parameters,training_parameters,args_net,data_file,scenes)
     
     net = net.to(device)
-    optimizer = optim.Adam(net.parameters(),lr = training_parameters["lr"])
+    optimizer = optim.Adam(net.parameters(),lr = training_parameters["lr"],weight_decay=training_parameters["weight_decay"])
     criterion = helpers.MaskedLoss(nn.MSELoss(reduction="none"))
 
     args_training = {

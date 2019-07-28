@@ -19,8 +19,12 @@ import helpers.helpers_training as helpers
 import torch.nn as nn
 import numpy as np
 import os 
+import ot
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 from datasets.datasets import Hdf5Dataset,CustomDataLoader
+from pyemd import emd_samples
 # from classes.evaluation import Evaluation
 
 def ade(outputs,targets,mask = None):
@@ -144,77 +148,6 @@ def get_data_loader(parameters_project,data_file,scene,args_net,prepare_param,ev
     data_loader = CustomDataLoader( batch_size = eval_params["batch_size"],shuffle = False,drop_last = False,dataset = dataset,test=0)
     return data_loader
 
-#
-#    COnsiders each pair of agent as an interaction
-#    Counts the number of problematic interaction
-#    averages the percentage over all timesteps
-#    returns conflicts coordinates without specifying their timestep
-# def conflicts(output,threshold = 0.5):
-#     timesteps = []
-#     timesteps_disjoint = []
-
-#     conflict_points = np.array([])
-#     for t in range(output.shape[1]):
-#         points = np.array(output[:,t])
-#         d = distance_matrix(points,points)
-
-#         m = (d < threshold).astype(int) - np.eye(len(points))
-#         total_count = np.ones_like(m)
-#         m = np.triu(m,1)
-#         total_count = np.triu(total_count,1)
-
-#         # disjoint (only first trajectory)
-#         if float(total_count[0].sum()) > 0.:
-#             conflict_prop_disjoint = m[0].sum() / float(total_count[0].sum())
-#         else:
-#             conflict_prop_disjoint = 0
-#         # joint
-#         if float(total_count.sum()) > 0.:           
-#             conflict_prop = m.sum() / float(total_count.sum())
-#         else:
-#             conflict_prop = 0
-
-#         timesteps.append(conflict_prop)
-#         timesteps_disjoint.append(conflict_prop_disjoint)
-
-
-#         # select points where conflict happens
-#         ids = np.unique( np.argwhere(m)[:,0] ) 
-#         if len(ids) > 0:
-#             points = points[ids]
-#             if len(conflict_points) > 0:
-#                 conflict_points = np.concatenate([conflict_points,points], axis = 0)
-#             else:
-#                 conflict_points = points
-
-
-
-#     return np.mean(timesteps),np.mean(timesteps_disjoint),timesteps,timesteps_disjoint,conflict_points.tolist()
-
-# def dynamic_eval(output,types,dynamics,types_dic,delta_t,dynamic_threshold = 0.0):
-#     acc_lhood = []
-#     speed_lhood = []
-
-#     for a in range(output.shape[0]):
-#         coordinates = output[a]
-#         type_ = types[a]
-#         type_ = types_dic[str(int(type_+1))]
-
-#         speeds = np.array(get_speeds(coordinates,delta_t))
-#         accelerations = np.array(get_accelerations(speeds,delta_t))
-#         dynamic_type = dynamics[type_]
-
-#         acc_props = norm.pdf(accelerations, loc = dynamic_type["accelerations"]["mean"], scale=dynamic_type["accelerations"]["std"]) 
-#         speed_props = norm.pdf(accelerations, loc = dynamic_type["speeds"]["mean"], scale=dynamic_type["speeds"]["std"]) 
-
-#         acc_lhood.append( acc_props)
-#         speed_lhood.append(speed_props)
-
-#     acc_lhood_disjoint = acc_lhood[0]
-#     speed_lhood_disjoint = speed_lhood[0]
-
-#     return acc_lhood,speed_lhood,acc_lhood_disjoint,speed_lhood_disjoint,np.mean(acc_lhood),np.mean(speed_lhood),np.mean(acc_lhood_disjoint),np.mean(speed_lhood_disjoint)
-
 
 def get_speed(point1,point2,deltat):
     d = distance.euclidean(point1,point2)
@@ -238,20 +171,6 @@ def get_accelerations(speeds,framerate):
         accelerations.append(acceleration)
     return accelerations
 
-
-# def scene_mask(scene,img_path,class_category,annotations_path):
-#         img = mpimg.imread(img_path.format(scene))
-#         empty_mask = np.zeros_like(img[:,:,0]).astype(np.int32)
-#         annotations = json.load(open(annotations_path.format(scene)))
-#         polygons = []
-#         for object_ in annotations["objects"]:
-#                 if object_["classTitle"] == class_category:
-#                         pts = object_["points"]["exterior"]
-#                         a3 = np.array( [pts] ).astype(np.int32)          
-#                         cv2.fillPoly( empty_mask, a3, 1 )
-#         return empty_mask
-
-# returns array of two masks, first one is pedestrian, second one is wheels
 def scene_mask(scene,img_path,annotations_path,spatial_profiles):
         img = mpimg.imread(img_path.format(scene))
 
@@ -276,78 +195,6 @@ def scene_mask(scene,img_path,annotations_path,spatial_profiles):
         
         return masks
 
-# def spatial_conflicts(mask,trajectory_p):
-#         ctr = 0
-#         # print(mask.shape)
-#         for point in trajectory_p:
-#                 #case out of frame
-#                 if point[1] in range(0,mask.shape[0]) and point[0] in range(0,mask.shape[1]):
-#                     if mask[point[1],point[0]]:
-#                             ctr += 1
-#         return ctr / float(len(trajectory_p))
-
-# def spatial_conflicts(mask,trajectory_p):
-#         ctr = 0
-#         # print(mask.shape)
-#         frame_conflicts = np.zeros(len(trajectory_p))
-#         for i,point in enumerate(trajectory_p):
-#                 #case out of frame
-#                 if point[1] in range(0,mask.shape[0]) and point[0] in range(0,mask.shape[1]):
-#                     if mask[point[1],point[0]]:
-#                         frame_conflicts[i] = 0
-                    
-#         return frame_conflicts
-
-# def spatial_loss(spatial_profile_ids,spatial_masks,outputs,pixel2meters):
-#     spatial_losses = []
-#     for id_,trajectory_p in zip(spatial_profile_ids,outputs):
-#         trajectory_p *= pixel2meters
-#         trajectory_p = trajectory_p.astype(np.int32)
-#         res = spatial_conflicts(spatial_masks[id_],trajectory_p)
-#         spatial_losses.append(res)
-#     return spatial_losses[0], np.mean(spatial_losses)
-
-# def spatial_loss(spatial_profile_ids,spatial_masks,outputs,pixel2meters):
-#     spatial_losses = []
-#     frames = []
-#     for id_,trajectory_p in zip(spatial_profile_ids,outputs):
-#         trajectory_p *= pixel2meters
-#         trajectory_p = trajectory_p.astype(np.int32)
-#         frame_conflicts = spatial_conflicts(spatial_masks[id_],trajectory_p)
-#         frames.append(frame_conflicts)
-#     frames = np.array(frames)
-
-#     # joint loss
-#     nb_conflicts_per_frame = []
-#     for t in range(frames.shape[1]):
-#         frame = frames[:,t]
-#         nb_conflicts_per_frame.append(np.sum(frame))
-#     # disjoint loss
-#     nb_conflicts_per_frame_disjoint = []
-#     for t in range(frames.shape[1]):
-#         frame = frames[0,t]
-#         nb_conflicts_per_frame_disjoint.append(np.sum(frame))
-
-#     return np.mean(nb_conflicts_per_frame_disjoint), np.mean(nb_conflicts_per_frame) ,nb_conflicts_per_frame_disjoint, nb_conflicts_per_frame
-
-# for t in range(output.shape[1]):
-#     points = np.array(output[:,t])
-
-
-# def get_factor(scene,correspondences_trajnet,correspondences_manual):
-#     if scene in correspondences_trajnet:
-#         row = correspondences_trajnet[scene]
-#         pixel2meter_ratio = row["pixel2meter"]
-#         meter2pixel_ratio = 1/pixel2meter_ratio
-#     else:
-#         row = correspondences_manual[scene]
-#         meter_dist = row["meter_distance"]
-#         pixel_coord = row["pixel_coordinates"]
-#         pixel_dist = euclidean(pixel_coord[0],pixel_coord[1])
-#         pixel2meter_ratio = meter_dist/float(pixel_dist)
-#         meter2pixel_ratio = float(pixel_dist)/meter_dist
-
-#     return meter2pixel_ratio
 
 
 def predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device):
@@ -447,6 +294,8 @@ def convert_losses(losses,prefix,losses_in):
             losses[key][prefix+loss] = losses_in[key][loss]
     return losses
 
+
+
 def apply_criterion(criterion,scene_files):
     results = {"global":{"joint":[],"disjoint":[]}}
     for scene_file in scene_files:
@@ -475,7 +324,141 @@ def apply_criterion(criterion,scene_files):
     results["global"]["joint"] = np.mean(results["global"]["joint"])
     results["global"]["disjoint"] = np.mean(results["global"]["disjoint"])
     return results
-            
+
+
+def spatial_distrib(scene_files):
+    
+    spatial_conflicts_results = {}
+    for scene_file in scene_files:
+        scene = scene_file.split("/")[-1].split(".")[0].split("_")[0]
+
+        scene_file = json.load(open(scene_file))
+        labels = []
+        outputs = []
+
+        spatial_conflicts_results[scene] = {}
+
+        for sample in scene_file:
+            sample = scene_file[sample]
+            label = sample["labels"][0]
+            output = sample["outputs"][0]
+            type_ = sample["types"][0]
+
+            labels += label
+            outputs += output
+        spatial_conflicts_results[scene]["distance"] = emd_samples(labels,outputs)        
+
+    global_ = []
+    for scene in spatial_conflicts_results:
+        global_.append(spatial_conflicts_results[scene]["distance"])
+    
+    spatial_conflicts_results["global"] = {}
+    spatial_conflicts_results["global"]["distance"] = np.mean(global_)
+    return spatial_conflicts_results
+    
+        
+
+
+# def spatial_distrib(scene_files,scenes_dimensions, types_to_spatial, cell_size):
+    
+#     spatial_conflicts_results = {}
+#     for scene_file in scene_files:
+#         scene = scene_file.split("/")[-1].split(".")[0].split("_")[0]
+#         print(scene)
+#         spatial_conflicts_results[scene] = 0
+
+#         scene_file = json.load(open(scene_file))
+#         # h,w = scenes_dimensions[scene]
+
+#         # grid_label = get_grid(w,h,cell_size)
+#         # grid_output = get_grid(w,h,cell_size)
+
+#         a = []
+#         b = []
+
+        
+
+#         for sample in scene_file:
+#             sample = scene_file[sample]
+#             label = sample["labels"][0]
+#             output = sample["outputs"][0]
+#             type_ = sample["types"][0]
+
+#             a += label
+#             b += output
+#         print(emd_samples(a,b))
+        
+
+#     #         for p_label, p_output in zip(label, output):
+#     #             grid_label = fill_grid(p_label, grid_label, cell_size)
+#     #             grid_output = fill_grid(p_output, grid_output, cell_size)
+       
+#     #     grid_label = grid_label.flatten()
+#     #     grid_output = grid_output.flatten()
+
+#     #     grid_label /= grid_label.sum()
+#     #     grid_output /= grid_output.sum()
+
+
+#     #     cell_ids = np.arange(len(grid_label))/ len(grid_label)
+#     #     spatial_conflicts_results[scene] = wasserstein_distance(cell_ids,cell_ids,grid_label, grid_output)
+#     # global_ = []
+#     # for scene in spatial_conflicts_results:
+#     #     global_.append(spatial_conflicts_results[scene])
+#     # spatial_conflicts_results["global"] = np.mean(global_)
+#     # print(spatial_conflicts_results)
+
+
+
+def fill_grid(p,grid,cell_size):
+    i = int(p[0]/cell_size)
+    j = int(p[1]/cell_size)
+    # print(p,i,j)
+
+    if i < grid.shape[0] and j < grid.shape[1]:
+        grid[i,j] += 1
+    return grid
+
+# def get_grid(h,w,cell_size, meter_margin = 7):
+#     cell_margin = int(meter_margin/cell_size)
+#     print(cell_size, cell_margin)
+#     if int(meter_margin/cell_size) != meter_margin/cell_size:
+#         cell_margin += 1
+#     print(cell_margin)
+#     nh = int(h/cell_size) + 1 + cell_margin 
+#     nw = int(w/cell_size) + 1  + cell_margin 
+#     grid = np.zeros((nh,nw))
+#     return grid
+
+def get_grid(h,w,cell_size):
+    nh = int(h/cell_size) + 1 
+    nw = int(w/cell_size) + 1 
+    grid = np.zeros((nh,nw))
+    return grid
+
+
+def get_scene_dimension(pixel_height,pixel_width,pixel_meter_ratio):
+    meter_height = pixel_height * pixel_meter_ratio
+    meter_width = pixel_width * pixel_meter_ratio
+    return meter_height,meter_width
+
+def cut_decimals(a,n = 2):
+    return int(a * 10 ** n)/ 10 ** n
+def get_scene_dimensions(scenes,images,pixel_meter_ratios):
+    dimensions = {}
+    for scene in scenes:
+        pixel_meter_ratio = pixel_meter_ratios[scene]
+        img_path = images.format(scene)
+        img = np.array(cv2.imread(img_path))
+        print(img.shape)
+        h,w,_ = img.shape 
+        h,w = get_scene_dimension(h,w,pixel_meter_ratio)
+        h = cut_decimals(h)
+        w = cut_decimals(w)
+        dimensions[scene] = (h,w)
+    return dimensions
+
+
 def spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_profiles,pixel_meter_ratios):
     nb_sample = 0
     spatial_conflicts_results = { "global": {"groundtruth":0,"pred":0}}
@@ -531,11 +514,6 @@ def spatial_conflicts(mask,trajectory_p):
     return ctr
 
 
-
-# def spatial_loss(spatial_mask,trajectory,meters_to_pixel):
-#     trajectory *= meters_to_pixel
-#     nb = spatial_conflicts(spatial_mask,trajectory)    
-#     return nb
 
 def social_conflicts(scene_files):
     social_results = {}

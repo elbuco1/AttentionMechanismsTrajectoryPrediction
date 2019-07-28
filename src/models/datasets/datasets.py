@@ -302,6 +302,24 @@ class Hdf5Dataset():
             print("Done!")
             
             return images
+
+      def __load_images1(self):#cuda
+            images = {}
+            print("loading images features")
+            paddings = self.__get_paddings()
+            for scene,pad in zip(self.scene_list,paddings):
+                  img = Image.open(self.images_path.format(scene))
+                  transform = transforms.Compose([
+                        transforms.Pad(pad),
+                        transforms.ToTensor(),
+                        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                  ])               
+                  img = transform(img)
+                  images[scene] = img                
+
+            print("Done!")            
+            return images
+            
       def __get_paddings(self):
             widths,heights = [],[]
             for scene in self.scene_list:

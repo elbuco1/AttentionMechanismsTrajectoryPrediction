@@ -1,9 +1,9 @@
 {
 
-    "model":"spatial_attention",
+    "model":"cnn_mlp",
     "set_type_train": "train",
-    "set_type_test": "test",
-    "load_path" : "./models/training/model_9.tar",  
+    "set_type_test": "eval",
+    "load_path" : "",  
 
     "train":1,
     "test":0,
@@ -12,7 +12,8 @@
 
     "n_epochs" : 20,
     "batch_size": 32 ,    
-    "lr" : 0.0001, 
+    "lr" : 0.001, 
+    "weight_decay":0,
 
     
     "plot": 1,
@@ -22,6 +23,6 @@
     "nb_grad_plots":1,
 
 
-    "offsets":0,
+    "offsets":1,
     "offsets_input":0
 }

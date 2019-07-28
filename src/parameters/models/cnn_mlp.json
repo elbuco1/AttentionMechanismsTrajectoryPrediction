@@ -1,14 +1,14 @@
 {
     "input_dim":2,
     
-    "mlp_layers":[200],
+    "mlp_layers":[512,512,256,128],
     "output_size":24,
       
     "use_neighbors": 0,
     "use_images": 0,
 
     "kernel_size":5,
-    "nb_conv":4,
+    "nb_conv":2,
     "nb_kernel":32,
     "cnn_feat_size":256
 

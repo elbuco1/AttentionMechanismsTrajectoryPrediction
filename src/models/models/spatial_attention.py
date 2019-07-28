@@ -73,6 +73,8 @@ class SpatialAttention(nn.Module):
         # self.conv2pred = nn.Linear(self.input_length*self.convnet_embedding,self.dmodel)
         self.conv2pred = nn.Linear(self.cnn_feat_size,self.dmodel)
 
+        self.att_dropout = nn.Dropout(self.dropout_tfr)
+
 
 #########################################################
 
@@ -172,7 +174,7 @@ class SpatialAttention(nn.Module):
         q = x
         k = v = spatial_features
 
-        spatial_att = self.mha(q,k,v)  # B,Nmax,dmodel # no need for a mask
+        spatial_att = self.att_dropout(self.mha(q,k,v))  # B,Nmax,dmodel # no need for a mask
 
         ############################
         #### Predictor  ############

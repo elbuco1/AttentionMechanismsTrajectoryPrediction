@@ -4,10 +4,10 @@
     "report_name":"cnn_mlp",
     "models":[
         "rnn_mlp",
+        
         "cnn_mlp",
         "social_attention",
-        "spatial_attention",
-        "spatial_abs"
+        "spatial_var1"
     ],
     "metrics":[
         "ade_disjoint",
