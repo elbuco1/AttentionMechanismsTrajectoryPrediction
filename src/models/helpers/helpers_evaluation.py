@@ -25,6 +25,7 @@ import matplotlib.image as mpimg
 
 from datasets.datasets import Hdf5Dataset,CustomDataLoader
 from pyemd import emd_samples
+import scipy
 # from classes.evaluation import Evaluation
 
 def ade(outputs,targets,mask = None):
@@ -359,54 +360,58 @@ def spatial_distrib(scene_files):
         
 
 
-# def spatial_distrib(scene_files,scenes_dimensions, types_to_spatial, cell_size):
+def spatial_hist(scene_files,scenes_dimensions, types_to_spatial, cell_size):
     
-#     spatial_conflicts_results = {}
-#     for scene_file in scene_files:
-#         scene = scene_file.split("/")[-1].split(".")[0].split("_")[0]
-#         print(scene)
-#         spatial_conflicts_results[scene] = 0
+    spatial_conflicts_results = {}
+    for scene_file in scene_files:
+        scene = scene_file.split("/")[-1].split(".")[0].split("_")[0]
+        print(scene)
+        spatial_conflicts_results[scene] = 0
 
-#         scene_file = json.load(open(scene_file))
-#         # h,w = scenes_dimensions[scene]
+        scene_file = json.load(open(scene_file))
+        h,w = scenes_dimensions[scene]
 
-#         # grid_label = get_grid(w,h,cell_size)
-#         # grid_output = get_grid(w,h,cell_size)
+        grid_label = get_grid(w,h,cell_size)
+        grid_output = get_grid(w,h,cell_size)
 
-#         a = []
-#         b = []
+        spatial_conflicts_results[scene] = {}
 
+        for sample in scene_file:
+            sample = scene_file[sample]
+            label = sample["labels"][0]
+            output = sample["outputs"][0]
+            type_ = sample["types"][0]
+
+            
         
 
-#         for sample in scene_file:
-#             sample = scene_file[sample]
-#             label = sample["labels"][0]
-#             output = sample["outputs"][0]
-#             type_ = sample["types"][0]
-
-#             a += label
-#             b += output
-#         print(emd_samples(a,b))
-        
-
-#     #         for p_label, p_output in zip(label, output):
-#     #             grid_label = fill_grid(p_label, grid_label, cell_size)
-#     #             grid_output = fill_grid(p_output, grid_output, cell_size)
+            for p_label, p_output in zip(label, output):
+                grid_label = fill_grid(p_label, grid_label, cell_size)
+                grid_output = fill_grid(p_output, grid_output, cell_size)
        
-#     #     grid_label = grid_label.flatten()
-#     #     grid_output = grid_output.flatten()
+        grid_label = grid_label.flatten()
+        grid_output = grid_output.flatten()
 
-#     #     grid_label /= grid_label.sum()
-#     #     grid_output /= grid_output.sum()
+        grid_label /= grid_label.sum()
+        grid_output /= grid_output.sum()
 
 
-#     #     cell_ids = np.arange(len(grid_label))/ len(grid_label)
-#     #     spatial_conflicts_results[scene] = wasserstein_distance(cell_ids,cell_ids,grid_label, grid_output)
-#     # global_ = []
-#     # for scene in spatial_conflicts_results:
-#     #     global_.append(spatial_conflicts_results[scene])
-#     # spatial_conflicts_results["global"] = np.mean(global_)
-#     # print(spatial_conflicts_results)
+        spatial_conflicts_results[scene]["manhattan"] = scipy.spatial.distance.minkowski(grid_label,grid_output,p=1)
+        
+
+        
+        # print("a {}".format(wasserstein_distance(cell_distrib_label,cell_distrib_output)))
+
+
+    global_ = []
+
+    for scene in spatial_conflicts_results:
+        val = spatial_conflicts_results[scene]["manhattan"]
+        global_.append(val)
+    spatial_conflicts_results["global"] = {}
+    
+    spatial_conflicts_results["global"]["manhattan"] = np.mean(global_)
+    return spatial_conflicts_results
 
 
 

@@ -57,6 +57,8 @@ def main():
         scene_files = [ sub_dir_name+f  for f in  os.listdir(sub_dir_name) if "json" in f]
 
         dynamic_losses = {}
+        losses = {}
+
         print("speed distribution")
         speed_results = helpers_evaluation.speeds_distance(scene_files,types_dic,1.0/float(raw_parameters["new_framerate"]))
         print(time.time()-start)
@@ -68,7 +70,6 @@ def main():
         dynamic_losses["acceleration"] = acceleration_results
         json.dump(dynamic_losses,open(dir_name + "dynamic_losses.json","w"),indent=2)
 
-        losses = {}
 
         print("social conflicts distribution")
         conflicts_distrib_results = helpers_evaluation.get_distrib_conflicts(scene_files)
@@ -76,8 +77,8 @@ def main():
 
        
             
-        # # print(conflicts_distrib_results)
-        # # print(time.time()-start)
+        # print(conflicts_distrib_results)
+        # print(time.time()-start)
 
         print("social_conflicts")
         social_results = helpers_evaluation.social_conflicts(scene_files)
@@ -100,16 +101,22 @@ def main():
         print("fde")
         results_fde = helpers_evaluation.apply_criterion(helpers_evaluation.fde,scene_files)
         helpers_evaluation.convert_losses(losses,"fde_",results_fde)
-        print(time.time()-start)
+        # print(time.time()-start)
 
 
-        # helpers_evaluation.spatial_distrib(scene_files,types_to_spatial)
+        print("spatial histograms")
+        scenes_dimensions = helpers_evaluation.get_scene_dimensions(scenes, images, pixel_meter_ratios)
+        print(scenes_dimensions)
+        cell_size = 1
 
-        # scenes_dimensions = helpers_evaluation.get_scene_dimensions(scenes, images, pixel_meter_ratios)
-        # print(scenes_dimensions)
-        # cell_size = 1
-        # helpers_evaluation.spatial_distrib(scene_files,scenes_dimensions,types_to_spatial,cell_size)
+        cell_sizes = [0.5,1,2,5]
 
+        for cell_size in cell_sizes:
+            print("cell size {}".format(cell_size))
+            spatial_hist_results = helpers_evaluation.spatial_hist(scene_files,scenes_dimensions,types_to_spatial,cell_size)
+            helpers_evaluation.convert_losses(losses,"spatial_hist_{}_".format(cell_size),spatial_hist_results)
+        
+        
         spatial_distrib_results = helpers_evaluation.spatial_distrib(scene_files)
         helpers_evaluation.convert_losses(losses,"spatial_distrib_",spatial_distrib_results)
         

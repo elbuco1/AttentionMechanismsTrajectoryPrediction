@@ -139,7 +139,65 @@ def main():
     plt.close()
 
 
+    fig, ax = plt.subplots()
 
+
+    hists = {}
+
+    for model in models_list:
+        losses = json.load(open(dir_name.format(model)+"losses.json"))
+        losses = losses["global"]
+        for key in losses:
+            if "spatial_hist" in key:
+                cell_size = float(key.split("_")[2])
+                if cell_size not in hists:
+                    hists[cell_size] = []
+                hists[cell_size].append(losses[key])
+        
+
+    unit = []
+    hist_values = []
+
+    for key in hists:
+        unit.append(str(key))
+        hist_values.append(hists[key])
+
+
+    hist_values = np.array(hist_values)
+
+    fig, ax = plt.subplots()
+    
+    for i in range( hist_values.shape[1]):
+        ax.plot(unit,hist_values[:,i], label = models_list[i])
+    # axs[0].plot(unit,socials[:,1])
+    ax.set_title('Spatial hist metrics')
+    ax.set(xlabel='cell size histogram (m)', ylabel='histogram manhattan distance')
+    ax.legend()
+
+    fig.tight_layout()
+    plt.savefig(save_dir+"spatial_hist_losses.png")
+    plt.close()
+
+
+
+    fig, ax = plt.subplots()
+    hist_values = np.mean(hist_values, axis = 0)
+      
+
+    pos = np.arange(len(hist_values))
+    ax.bar(pos,  hist_values )
+    ax.set_xticks( pos)
+    ax.set_xticklabels(models_list)
+    ax.set_title('Spatial hist metrics')
+    ax.set(xlabel='Models', ylabel='Mean over cell sizes of manhattan distance between histograms')
+   
+
+    fig.tight_layout()
+    plt.savefig(save_dir+"spatial_hist_mean_losses.png")
+    plt.close()
+
+
+    fig, ax = plt.subplots()
 
 if __name__ == "__main__":
     main()
