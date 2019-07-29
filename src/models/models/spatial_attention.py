@@ -13,7 +13,8 @@ from models.cnn import CNN
 
 
 
-from models.soft_attention import SoftAttention
+import models.soft_attention as soft_attention
+
 
 import torch.nn.functional as f 
 
@@ -28,19 +29,9 @@ class SpatialAttention(nn.Module):
         self.input_length =  args["input_length"]
         self.output_length =  args["output_length"]
         self.pred_dim =  args["pred_dim"]
-
         
-        self.dmodel =  args["dmodel"]
         self.predictor_layers =  args["predictor_layers"]
-        # self.pred_dim =  args["pred_dim"]
-        # self.dropout_tcn =  args["dropout_tcn"]
-        self.dropout_tfr =  args["dropout_tfr"]
-
-
-
-        # self.convnet_nb_layers =  args["convnet_nb_layers"]
-        self.spatial_projection = args["spatial_projection"]
-        
+        self.spatial_projection = args["spatial_projection"]        
 
         # cnn parameters
         self.nb_conv = args["nb_conv"] # depth
@@ -48,60 +39,35 @@ class SpatialAttention(nn.Module):
         self.cnn_feat_size = args["cnn_feat_size"] # projection size of output
         self.kernel_size =  args["kernel_size"] 
 
-
-
-
-
-        # self.vgg_feature_size = args["vgg_feature_size"]
         self.projection_layers = args["projection_layers"]
-
-
+        self.dmodel =  args["dmodel"]
+        self.use_mha = args["use_mha"]
+        self.h = args["h"]
+        self.mha_dropout = args["mha_dropout"]
+        self.joint_optimisation = args["joint_optimisation"]
 
 ######## Dynamic part #####################################
-############# x/y embedding ###############################
-        # self.coord_embedding = nn.Linear(self.input_dim,self.coordinates_embedding)
-############# TCN #########################################
+############# CNN #########################################
                 
         self.tcn = CNN(num_inputs = self.input_dim,nb_kernel = self.nb_kernel,cnn_feat_size = self.cnn_feat_size,obs_len = self.input_length ,kernel_size = self.kernel_size,nb_conv = self.nb_conv)
-
-
-
-
-        # project conv features to dmodel
         self.conv2att = nn.Linear(self.cnn_feat_size,self.dmodel)
-
-        # self.conv2pred = nn.Linear(self.input_length*self.convnet_embedding,self.dmodel)
         self.conv2pred = nn.Linear(self.cnn_feat_size,self.dmodel)
 
-        self.att_dropout = nn.Dropout(self.dropout_tfr)
-
-
-#########################################################
-
 ##### Spatial part ##############################################
-
 ############# features ##########################################
-        # self.cnn = customCNN(self.device,nb_channels_projection= self.spatial_projection)
         self.cnn = customCNN2(self.device,nb_channels_projection= self.spatial_projection)
-
         self.spatt2att = nn.Linear(self.spatial_projection,self.dmodel)
 
 ############# Attention #########################################
-        
-        self.mha = SoftAttention(self.device,self.dmodel,self.projection_layers,self.dropout_tfr)
-
-################################################################
-################################################################
-
+        if self.use_mha:
+            self.soft = soft_attention.MultiHeadAttention(self.device,self.dmodel,self.h,self.mha_dropout)
+        else:
+            self.soft = soft_attention.SoftAttention(self.device,self.dmodel,self.projection_layers,self.mha_dropout)
 
 # ############# Predictor #########################################
 
-        # concat multihead attention and conv_features to make prediction
         self.predictor = []
         self.predictor.append(nn.Linear(self.dmodel*2,self.predictor_layers[0]))
-
-
-
         self.predictor.append(nn.ReLU())
 
         for i in range(1,len(self.predictor_layers)):
@@ -112,10 +78,6 @@ class SpatialAttention(nn.Module):
 
         self.predictor = nn.Sequential(*self.predictor)
 
-
-
-
-
     def forward(self,x):
 
         # split input
@@ -124,12 +86,6 @@ class SpatialAttention(nn.Module):
         points_mask = x[3][1]
         imgs = x[4]
         x = x[0]
-
-        #### DYnamic branch ####
-        # project 2d spatial coordinates into embedding space of dimension coordinates_embedding
-        # x = self.coord_embedding(x)
-        # x = torch.nn.functional.relu(x)
-
        
         # permute channels and sequence length
         B,Nmax,Tobs,Nfeat = x.size()
@@ -137,18 +93,11 @@ class SpatialAttention(nn.Module):
         x = x.view(-1,x.size()[2],x.size()[3]) # [B*Nmax],Nfeat,Tobs
 
         # filter active agents
-        # y = torch.zeros(B*Nmax,self.convnet_embedding,Tobs).to(self.device) # [B*Nmax],Nfeat,Tobs
         y = torch.zeros(B*Nmax,self.cnn_feat_size).to(self.device) # [B*Nmax],Nfeat,
-
-
         # compute sequence feature vector
         y[active_agents] = self.tcn(x[active_agents]) # [B*Nmax],Nfeat,Tobs
-        # y = y.permute(0,2,1) # [B*Nmax],Tobs,Nfeat
-        # conv_features = y.view(B,Nmax,Tobs,y.size()[2]).contiguous() # B,Nmax,Tobs,Nfeat
 
         conv_features = y.view(B,Nmax,y.size()[1]).contiguous() # B,Nmax,Tobs,Nfeat
-        # select last hidden state
-        # y_last = conv_features[:,:,-1]       
 
         # project trajectory features to be used as query in spatial attention module to dmodel dimension
         x = self.conv2att(conv_features) # B,Nmax,dmodel    
@@ -174,20 +123,17 @@ class SpatialAttention(nn.Module):
         q = x
         k = v = spatial_features
 
-        spatial_att = self.att_dropout(self.mha(q,k,v))  # B,Nmax,dmodel # no need for a mask
+        spatial_att = self.soft(q,k,v)# B,Nmax,dmodel
+        if not self.joint_optimisation:
+            conv_features = conv_features[:,0].unsqueeze(1)
 
         ############################
         #### Predictor  ############
-
-
         y = torch.cat([spatial_att,conv_features],dim = 2 ) # B,Nmax,2*dmodel
-
         y = self.predictor(y)
-
         t_pred = int(self.pred_dim/float(self.input_dim))
         # print(t_pred,self.pred_dim,self.input_dim)
         y = y.view(B,Nmax,t_pred,self.input_dim) #B,Nmax,Tpred,Nfeat
-
         return y
 
 

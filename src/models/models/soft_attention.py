@@ -36,28 +36,10 @@ class MultiHeadAttention(nn.Module):
         return att #B,Nmax,dv
 
     def get_mask(self,points_mask,max_batch,multiquery = 0):
-        # on met des 1 pour le poids entre un agent actif en ligne et un agent inactif en colonne
-        # pour le cas de l'agent inactif en ligne, peu importe il ne sera pas utilisé pour
-        # la rétropropagation
         if max_batch == 1:
             points_mask = np.expand_dims(points_mask, axis = 1)
 
         mha_mask = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) == 0).astype(int)
-        # mha_mask = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) > 0).astype(int)
-
-        # a = np.repeat(np.expand_dims(mha_mask,axis = 2),max_batch,axis = -1)
-        # b = np.transpose(a,axes=(0,2,1))
-        # mha_mask = np.logical_and(np.logical_xor(a,b),a).astype(int)
-       
-
-        # if not multiquery:
-        #     mha_mask = np.expand_dims(mha_mask[:,0],1)        
-        # mha_mask = np.expand_dims(mha_mask,1)    
-        # mha_mask = mha_mask.repeat(self.h,axis =1)        
-        # b,h,nq,nk = mha_mask.shape 
-        # mha_mask = mha_mask.reshape(b*h,nq,nk)
-
-        # print(mha_mask.shape)
         return torch.ByteTensor(mha_mask).detach()
 
 class LinearProjection(nn.Module):

@@ -56,23 +56,7 @@ class SocialAttention(nn.Module):
         self.joint_optimisation = args["joint_optimisation"]
         
 
-
-
-############# x/y embedding ###############################
-        # self.coord_embedding = nn.Linear(self.input_dim,self.coordinates_embedding_size)
-############# cnn #########################################
-        # compute nb temporal blocks
-
-       
-        # self.nb_temporal_blocks = self.__get_nb_blocks(self.input_length,self.kernel_size)        
-        # self.num_channels = [self.convnet_embedding for _ in range(self.nb_temporal_blocks)]
-
-        # init network
-        # self.tcn = TemporalConvNet(self.device, self.coordinates_embedding, self.num_channels, self.kernel_size, self.dropout_tcn)
-
         self.cnn = CNN(num_inputs = self.input_dim,nb_kernel = self.nb_kernel,cnn_feat_size = self.cnn_feat_size,obs_len = self.input_length ,kernel_size = self.kernel_size,nb_conv = self.nb_conv)
-
-
 
         # project conv features to dmodel
         self.conv2att = nn.Linear(self.cnn_feat_size,self.dmodel)

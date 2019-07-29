@@ -1,7 +1,10 @@
 {
     "input_dim":2,
-    "dmodel":32,
-    "dropout_tfr" : 0,
+
+    "dmodel":128,
+    "mha_dropout" : 0.1,
+    "h":4,
+    "use_mha":1,
     
     
     "predictor_layers": [100],

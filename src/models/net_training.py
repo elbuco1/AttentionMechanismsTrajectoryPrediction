@@ -147,7 +147,6 @@ def main():
             "cnn_feat_size": net_params["cnn_feat_size"],
             "kernel_size" : net_params["kernel_size"],
 
-            "dropout_tfr" : net_params["dropout_tfr"],
             "projection_layers":net_params["projection_layers"],
             "spatial_projection":net_params["spatial_projection"],
 
@@ -158,6 +157,10 @@ def main():
             "use_neighbors":net_params["use_neighbors"],
             "offsets":training_parameters["offsets"],
             "offsets_input" : training_parameters["offsets_input"],
+            "use_mha": net_params["use_mha"],
+            "h": net_params["h"],
+            "mha_dropout": net_params["mha_dropout"],
+            "joint_optimisation": training_parameters["joint_optimisation"]
 
         }
         
