@@ -1,6 +1,6 @@
 {
 
-    "model":"spatial_attention",
+    "model":"s2s_social_attention",
     "set_type_train": "train",
     "set_type_test": "eval",
     "load_path" : "",  
@@ -8,9 +8,7 @@
     "train":1,
     "test":0,
    
-    "unjoint_optimisation":1,
-
-    "n_epochs" : 20,
+    "n_epochs" : 40,
     "batch_size": 32 ,    
     "lr" : 0.001, 
     "weight_decay":0,

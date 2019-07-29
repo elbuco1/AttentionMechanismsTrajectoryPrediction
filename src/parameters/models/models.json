@@ -2,7 +2,10 @@
     "rnn_mlp":"./src/parameters/models/rnn_mlp.json",
     "cnn_mlp":"./src/parameters/models/cnn_mlp.json",
     "social_attention":"./src/parameters/models/social_attention.json",
-    "spatial_attention":"./src/parameters/models/spatial_attention.json"
+    "spatial_attention":"./src/parameters/models/spatial_attention.json",
+    "s2s_social_attention":"./src/parameters/models/s2s_social_attention.json",
+    "s2s_spatial_attention":"./src/parameters/models/s2s_spatial_attention.json"
+
 
 
 

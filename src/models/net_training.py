@@ -10,6 +10,10 @@ import os
 from models.rnn_mlp import RNN_MLP
 from models.social_attention import SocialAttention
 from models.spatial_attention import SpatialAttention
+from models.s2s_social_attention import S2sSocialAtt
+from models.s2s_spatial_attention import S2sSpatialAtt
+
+
 
 from models.cnn_mlp import CNN_MLP
 import random
@@ -161,12 +165,66 @@ def main():
             "h": net_params["h"],
             "mha_dropout": net_params["mha_dropout"],
             "joint_optimisation": training_parameters["joint_optimisation"]
-
-        }
-        
-
+        }       
         net_type = SpatialAttention
-    
+    elif model_name == "s2s_social_attention":
+        args_net = {
+            "device" : device,
+            "input_dim" : net_params["input_dim"],
+            "input_length" : processed_parameters["t_obs"],
+            "pred_length" : processed_parameters["t_pred"],
+            "pred_dim" : processed_parameters["t_pred"] * net_params["input_dim"] ,
+            
+            "enc_hidden_size" : net_params["enc_hidden_size"],
+            "enc_num_layers" : net_params["enc_num_layers"],
+            "dec_hidden_size" : net_params["dec_hidden_size"],
+            "dec_num_layer" : net_params["dec_num_layer"],
+
+            "embedding_size" : net_params["embedding_size"],
+            "output_size" : net_params["output_size"],
+            "projection_layers" : net_params["projection_layers"],
+            "enc_feat_embedding" : net_params["enc_feat_embedding"],
+            "condition_decoder_on_outputs" : net_params["condition_decoder_on_outputs"],
+            
+            "model_name":model_name,
+
+            "use_images":net_params["use_images"],
+            "use_neighbors":net_params["use_neighbors"],
+            "offsets":training_parameters["offsets"],
+            "offsets_input" : training_parameters["offsets_input"],
+            "joint_optimisation": training_parameters["joint_optimisation"]
+        }       
+        net_type = S2sSocialAtt
+    elif model_name == "s2s_spatial_attention":
+        args_net = {
+            "device" : device,
+            "input_dim" : net_params["input_dim"],
+            "input_length" : processed_parameters["t_obs"],
+            "output_length" : processed_parameters["t_pred"],
+            "pred_dim" : processed_parameters["t_pred"] * net_params["input_dim"] ,
+            
+            "enc_hidden_size" : net_params["enc_hidden_size"],
+            "enc_num_layers" : net_params["enc_num_layers"],
+            "dec_hidden_size" : net_params["dec_hidden_size"],
+            "dec_num_layer" : net_params["dec_num_layer"],
+
+            "embedding_size" : net_params["embedding_size"],
+            "output_size" : net_params["output_size"],
+            "projection_layers" : net_params["projection_layers"],
+
+            "att_feat_embedding" : net_params["enc_feat_embedding"],
+
+            "condition_decoder_on_outputs" : net_params["condition_decoder_on_outputs"],
+            
+            "model_name":model_name,
+
+            "use_images":net_params["use_images"],
+            "use_neighbors":net_params["use_neighbors"],
+            "offsets":training_parameters["offsets"],
+            "offsets_input" : training_parameters["offsets_input"],
+            "joint_optimisation": training_parameters["joint_optimisation"]
+        }       
+        net_type = S2sSpatialAtt
         
     # init neural network
     net = net_type(args_net)
