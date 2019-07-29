@@ -171,6 +171,18 @@ class S2sSocialAtt(nn.Module):
 
         # embedded last point of input sequence
         out = x_e[:,:,-1] # B,N,embedding_size
+        
+        if not self.joint_optimisation:
+            out = out[:,0].unsqueeze(1)
+            hidden_h = hidden[0].view(self.enc_num_layers,B,N,self.enc_hidden_size)
+            hidden_h = hidden_h[:,:,0].unsqueeze(2)
+            hidden_h = hidden_h.view(self.enc_num_layers,B,self.enc_hidden_size)
+            hidden_c = hidden[1].view(self.enc_num_layers,B,N,self.enc_hidden_size)
+            hidden_c = hidden_c[:,:,0].unsqueeze(2)
+            hidden_c = hidden_c.view(self.enc_num_layers,B,self.enc_hidden_size)
+
+            hidden = (hidden_h.contiguous(), hidden_c.contiguous())
+            N = 1
 
         ######## Prediction part ##############################
         outputs = []
@@ -188,11 +200,13 @@ class S2sSocialAtt(nn.Module):
 
              
             # attention features          
-            # att = self.attention(q,k,v,points_mask, self.joint_optimisation) # B N encoder_features_embedding
-            att = self.attention(q,k,v,points_mask) # B N encoder_features_embedding
+            att = self.attention(q,k,v,points_mask, self.joint_optimisation) # B N encoder_features_embedding
             
             ##################################################
             ####### Prediction ###############################
+
+            
+
 
             if self.condition_decoder_on_outputs:
                 in_dec = torch.cat([out,att],dim = 2) # B N embedding_size + encoder_features_embedding (embedding_size == encoder_features_embedding)
@@ -200,6 +214,7 @@ class S2sSocialAtt(nn.Module):
                 in_dec = att
             
             in_dec = in_dec.unsqueeze(2) # B N 1 2*encoder_features_embedding
+            
             in_dec = in_dec.view(B*N,1,in_dec.size()[-1]) # B*N 1 2*encoder_features_embedding  (batch,seqlen,feat_size)
             
             
