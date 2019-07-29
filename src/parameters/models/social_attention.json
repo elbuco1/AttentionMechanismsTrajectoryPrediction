@@ -6,7 +6,7 @@
     "dmodel":128,
     "mha_dropout" : 0.1,
     "h":4,
-    "use_mha":1,
+    "use_mha":0,
     
     
     "predictor_layers": [100,100],

@@ -98,7 +98,7 @@ class S2sSpatialAtt(nn.Module):
         self.att_features_embedding = args["att_feat_embedding"]
         self.spatial_projection = args["spatial_projection"]
         self.condition_decoder_on_outputs = args["condition_decoder_on_outputs"]
-        self.joint_optimisation = args["joint_optimisation"]
+        
 
 
 
@@ -188,6 +188,7 @@ class S2sSpatialAtt(nn.Module):
         # embedded last point of input sequence
         out = x_e[:,:,-1] # B,N,embedding_size
 
+        
         ######## Prediction part ##############################
         outputs = []
 

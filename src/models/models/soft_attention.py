@@ -102,7 +102,9 @@ class SoftAttention(nn.Module):
 
     def forward(self,q,k,v,points_mask = None, multiquery = 0):
         if points_mask is not None:
-            mask = self.get_mask(points_mask,q.size()[1]).to(self.device)
+            mask = self.get_mask(points_mask,points_mask.shape[1]).to(self.device)
+            # mask = self.get_mask(points_mask,q.size()[1]).to(self.device)
+
         else:
             mask = None
 
@@ -117,8 +119,8 @@ class SoftAttention(nn.Module):
         # on met des 1 pour le poids entre un agent actif en ligne et un agent inactif en colonne
         # pour le cas de l'agent inactif en ligne, peu importe il ne sera pas utilisé pour
         # la rétropropagation
-        if max_batch == 1:
-            points_mask = np.expand_dims(points_mask, axis = 1)
+        # if max_batch == 1:
+        #     points_mask = np.expand_dims(points_mask, axis = 1)
 
         sample_sum = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) > 0).astype(int)
         a = np.repeat(np.expand_dims(sample_sum,axis = 2),max_batch,axis = -1)

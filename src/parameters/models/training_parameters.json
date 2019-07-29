@@ -1,6 +1,6 @@
 {
 
-    "model":"s2s_social_attention",
+    "model":"social_attention",
     "set_type_train": "train",
     "set_type_test": "eval",
     "load_path" : "",  

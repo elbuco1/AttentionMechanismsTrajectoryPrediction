@@ -200,7 +200,7 @@ def main():
             "device" : device,
             "input_dim" : net_params["input_dim"],
             "input_length" : processed_parameters["t_obs"],
-            "output_length" : processed_parameters["t_pred"],
+            "pred_length" : processed_parameters["t_pred"],
             "pred_dim" : processed_parameters["t_pred"] * net_params["input_dim"] ,
             
             "enc_hidden_size" : net_params["enc_hidden_size"],
@@ -212,7 +212,9 @@ def main():
             "output_size" : net_params["output_size"],
             "projection_layers" : net_params["projection_layers"],
 
-            "att_feat_embedding" : net_params["enc_feat_embedding"],
+            "att_feat_embedding" : net_params["att_feat_embedding"],
+            "spatial_projection" : net_params["spatial_projection"],
+
 
             "condition_decoder_on_outputs" : net_params["condition_decoder_on_outputs"],
             
@@ -221,8 +223,7 @@ def main():
             "use_images":net_params["use_images"],
             "use_neighbors":net_params["use_neighbors"],
             "offsets":training_parameters["offsets"],
-            "offsets_input" : training_parameters["offsets_input"],
-            "joint_optimisation": training_parameters["joint_optimisation"]
+            "offsets_input" : training_parameters["offsets_input"]
         }       
         net_type = S2sSpatialAtt
         
