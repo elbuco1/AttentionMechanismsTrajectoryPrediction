@@ -13,7 +13,6 @@ class CNN(nn.Module):
         self.cnn_feat_size = cnn_feat_size
         self.obs_len = obs_len
 
-        print(self.nb_conv)
         self.cnn = nn.Sequential()
         
         # if self.kernel_size % 2 == 1:

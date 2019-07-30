@@ -24,7 +24,9 @@
     
     "use_neighbors": 0,
     "use_images": 1,
-    "froze_cnn":1
+    "froze_cnn":1,
+    "condition_on_trajectory":1
+
 
  
     

@@ -23,7 +23,8 @@
     
 
     "use_neighbors": 1,
-    "use_images": 0
+    "use_images": 0,
+    "condition_on_trajectory":0
     
 
 

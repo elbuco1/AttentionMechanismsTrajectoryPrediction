@@ -133,7 +133,8 @@ def main():
             "joint_optimisation": training_parameters["joint_optimisation"],
 
             "tfr_feed_forward_dim": net_params["tfr_feed_forward_dim"],
-            "tfr_num_layers": net_params["tfr_num_layers"]
+            "tfr_num_layers": net_params["tfr_num_layers"],
+            "condition_on_trajectory": net_params["condition_on_trajectory"]
         }     
 
         net_type = SocialAttention
@@ -168,7 +169,9 @@ def main():
             "joint_optimisation": training_parameters["joint_optimisation"],
             "froze_cnn": net_params["froze_cnn"],
             "tfr_feed_forward_dim": net_params["tfr_feed_forward_dim"],
-            "tfr_num_layers": net_params["tfr_num_layers"]
+            "tfr_num_layers": net_params["tfr_num_layers"],
+            "condition_on_trajectory": net_params["condition_on_trajectory"]
+
 
         }       
         net_type = SpatialAttention
