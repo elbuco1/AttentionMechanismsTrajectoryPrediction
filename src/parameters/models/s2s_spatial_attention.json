@@ -19,7 +19,9 @@
     
     
     "use_neighbors": 0,
-    "use_images": 1
+    "use_images": 1,
+    "froze_cnn":1
+
 
     
 }

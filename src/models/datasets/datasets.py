@@ -64,9 +64,10 @@ class CustomDataLoader():
 """
 class Hdf5Dataset():
       'Characterizes a dataset for PyTorch'
-      def __init__(self,padding,hdf5_file,scene_list,t_obs,t_pred,set_type, data_type,use_neighbors,use_images,images_path,
+      def __init__(self,padding,hdf5_file,scene_list,t_obs,t_pred,set_type, data_type,use_neighbors,use_images,images_path,froze_cnn = 1,
                   use_masks = False,reduce_batches = True, predict_offsets = 0,offsets_input = 0,evaluation = 0):
-
+            
+            self.froze_cnn = froze_cnn
             self.use_images = use_images   
             self.images_path = images_path + "{}.jpg"
 
@@ -107,8 +108,11 @@ class Hdf5Dataset():
 
             self.shape = self.coord_dset.shape
             if self.use_images:
-                  # self.images = self.__load_images1()
-                  self.images = self.__load_images()
+                  if self.froze_cnn:
+                        self.images = self.__load_images_features()
+                  else:
+                        self.images = self.__load_images()
+                        
 
             
       def __del__(self):
@@ -269,7 +273,7 @@ class Hdf5Dataset():
 
             return X,y,(active_mask_in,active_mask),active_last_points,original_x
 
-      def __load_images(self):#cuda
+      def __load_images_features(self):#cuda
             images = {}
             print("loading images features")
             # cnn = customCNN1()
@@ -305,9 +309,9 @@ class Hdf5Dataset():
             
             return images
 
-      def __load_images1(self):#cuda
+      def __load_images(self):#cuda
             images = {}
-            print("loading images features")
+            print("loading images ")
             paddings = self.__get_paddings()
             for scene,pad in zip(self.scene_list,paddings):
                   img = Image.open(self.images_path.format(scene))

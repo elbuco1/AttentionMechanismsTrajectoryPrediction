@@ -9,6 +9,8 @@ import time
 
 
 from models.pretrained_vgg import customCNN2
+from models.pretrained_vgg import customCNN
+
 from models.cnn import CNN
 
 
@@ -45,6 +47,7 @@ class SpatialAttention(nn.Module):
         self.h = args["h"]
         self.mha_dropout = args["mha_dropout"]
         self.joint_optimisation = args["joint_optimisation"]
+        self.froze_cnn = args["froze_cnn"]
 
 ######## Dynamic part #####################################
 ############# CNN #########################################
@@ -55,7 +58,11 @@ class SpatialAttention(nn.Module):
 
 ##### Spatial part ##############################################
 ############# features ##########################################
-        self.cnn = customCNN2(self.device,nb_channels_projection= self.spatial_projection)
+        if self.froze_cnn:
+            self.cnn = customCNN2(self.device,nb_channels_projection= self.spatial_projection)
+        else:
+            self.cnn = customCNN(self.device,nb_channels_projection= self.spatial_projection)
+
         self.spatt2att = nn.Linear(self.spatial_projection,self.dmodel)
 
 ############# Attention #########################################

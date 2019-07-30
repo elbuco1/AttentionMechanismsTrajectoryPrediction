@@ -36,7 +36,8 @@ def load_data_loaders(parameters_project,prepare_param,training_param,net_params
         offsets_input = net_params["offsets_input"],
         padding = prepare_param["padding"],
         use_images = net_params["use_images"],
-        images_path = parameters_project["raw_images"]
+        images_path = parameters_project["raw_images"],
+        froze_cnn= net_params["froze_cnn"]
         )
 
     eval_dataset = Hdf5Dataset(
@@ -53,7 +54,9 @@ def load_data_loaders(parameters_project,prepare_param,training_param,net_params
         offsets_input = net_params["offsets_input"],
         padding = prepare_param["padding"],
         use_images = net_params["use_images"],
-        images_path = parameters_project["raw_images"]
+        images_path = parameters_project["raw_images"],
+        froze_cnn= net_params["froze_cnn"]
+
 
         )
 

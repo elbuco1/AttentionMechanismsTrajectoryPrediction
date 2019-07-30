@@ -28,11 +28,8 @@ class MultiHeadAttention(nn.Module):
         k = k.permute(1,0,2)
         v = v.permute(1,0,2)
 
-        att,wgts = self.mha(q,k,v,key_padding_mask =  mask)
-        # att,wgts = self.mha(q,k,v,mask)
-       
+        att,wgts = self.mha(q,k,v,key_padding_mask =  mask)      
         att = att.permute(1,0,2)
-
         return att #B,Nmax,dv
 
     def get_mask(self,points_mask,max_batch):

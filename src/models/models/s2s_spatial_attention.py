@@ -9,6 +9,8 @@ import time
 from models.soft_attention import SoftAttention
 # from models.pretrained_vgg import customCNN
 from models.pretrained_vgg import customCNN2
+from models.pretrained_vgg import customCNN
+
 
 
 
@@ -98,6 +100,8 @@ class S2sSpatialAtt(nn.Module):
         self.att_features_embedding = args["att_feat_embedding"]
         self.spatial_projection = args["spatial_projection"]
         self.condition_decoder_on_outputs = args["condition_decoder_on_outputs"]
+        self.froze_cnn = args["froze_cnn"]
+
         
 
 
@@ -126,7 +130,12 @@ class S2sSpatialAtt(nn.Module):
 
         ############# features ##########################################
         # self.cnn = customCNN(self.device,nb_channels_projection= self.spatial_projection)
-        self.cnn = customCNN2(self.device,nb_channels_projection= self.spatial_projection)
+        # self.cnn = customCNN2(self.device,nb_channels_projection= self.spatial_projection)
+
+        if self.froze_cnn:
+            self.cnn = customCNN2(self.device,nb_channels_projection= self.spatial_projection)
+        else:
+            self.cnn = customCNN(self.device,nb_channels_projection= self.spatial_projection)
 
         # self.spatt2att = nn.Linear(self.spatial_projection,self.att_features_embedding)
 
