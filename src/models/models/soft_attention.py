@@ -35,8 +35,9 @@ class MultiHeadAttention(nn.Module):
 
         return att #B,Nmax,dv
 
-    def get_mask(self,points_mask,max_batch,multiquery = 0):
-        if max_batch == 1:
+    def get_mask(self,points_mask,max_batch):
+        if len(points_mask.shape) < 4:
+            print("please input size must be [b,n,s,i]")
             points_mask = np.expand_dims(points_mask, axis = 1)
 
         mha_mask = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) == 0).astype(int)
@@ -72,11 +73,10 @@ class LinearProjection(nn.Module):
 
         comp_q_v = torch.cat([q,k],dim = 3) # B,Nq,Nk,2dmodel 
         comp_q_v = self.projection_weight(comp_q_v).squeeze(3)  # B,Nq,Nk  
-
-        min_inf = float('-inf')       
+  
         # mask
         if mask is not None:
-            comp_q_v = comp_q_v.masked_fill(mask,min_inf)
+            comp_q_v = comp_q_v.masked_fill(mask.unsqueeze(1), float('-inf') )
         
         # softmax
         weights = f.softmax(comp_q_v,dim = 2 ) # B,Nq,Nk
@@ -85,11 +85,6 @@ class LinearProjection(nn.Module):
         att = torch.bmm(weights,v) # B,Nq,Nk * B,Nk,dmodel -> B,Nq,dmodel
         return att
     
-    
-
-    
-        # return torch.ByteTensor(mha_mask).to(self.device)
-
 
 class SoftAttention(nn.Module):
     # dk = dv = dmodel/h
@@ -102,8 +97,7 @@ class SoftAttention(nn.Module):
 
     def forward(self,q,k,v,points_mask = None, multiquery = 0):
         if points_mask is not None:
-            mask = self.get_mask(points_mask,points_mask.shape[1]).to(self.device)
-            # mask = self.get_mask(points_mask,q.size()[1]).to(self.device)
+            mask = self.get_mask(points_mask).to(self.device)
 
         else:
             mask = None
@@ -111,29 +105,15 @@ class SoftAttention(nn.Module):
         if not multiquery:
             q = q[:,0].unsqueeze(1)
         att = self.mlp_attention(q,k,v,mask)
-
-
         return att #B,Nmax,dv
+    
 
-    def get_mask(self,points_mask,max_batch,multiquery = 0):
-        # on met des 1 pour le poids entre un agent actif en ligne et un agent inactif en colonne
-        # pour le cas de l'agent inactif en ligne, peu importe il ne sera pas utilisé pour
-        # la rétropropagation
-        # if max_batch == 1:
-        #     points_mask = np.expand_dims(points_mask, axis = 1)
+    def get_mask(self,points_mask):
+        if len(points_mask.shape) < 4:
+            print("please input size must be [b,n,s,i]")
+            points_mask = np.expand_dims(points_mask, axis = 1)
 
-        sample_sum = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) > 0).astype(int)
-        a = np.repeat(np.expand_dims(sample_sum,axis = 2),max_batch,axis = -1)
-        b = np.transpose(a,axes=(0,2,1))
-        mha_mask = np.logical_and(np.logical_xor(a,b),a).astype(int)
-        # mha_mask = np.logical_xor(a,b).astype(int)
-
-        # eyes = np.expand_dims(np.eye(mha_mask.shape[-1]),0)
-        # eyes = eyes.repeat(mha_mask.shape[0],0)
-
-        # mha_mask = np.logical_or(mha_mask,eyes).astype(int)
-        if not multiquery:
-            mha_mask = np.expand_dims(mha_mask[:,0],1)
+        mha_mask = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) == 0).astype(int)
         return torch.ByteTensor(mha_mask).detach()
 
 
@@ -143,3 +123,22 @@ class SoftAttention(nn.Module):
 
 
 
+# mask = self.get_mask(points_mask,q.size()[1]).to(self.device)
+
+# def get_mask(self,points_mask,max_batch,multiquery = 0):
+    #     # on met des 1 pour le poids entre un agent actif en ligne et un agent inactif en colonne
+    #     # pour le cas de l'agent inactif en ligne, peu importe il ne sera pas utilisé pour
+    #     # la rétropropagation
+
+    #     if len(points_mask.shape) < 4:
+    #         print("please input size must be [b,n,s,i]")
+    #         points_mask = np.expand_dims(points_mask, axis = 1)
+
+    #     sample_sum = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) > 0).astype(int)
+    #     a = np.repeat(np.expand_dims(sample_sum,axis = 2),max_batch,axis = -1)
+    #     b = np.transpose(a,axes=(0,2,1))
+    #     mha_mask = np.logical_and(np.logical_xor(a,b),a).astype(int)
+
+    #     if not multiquery:
+    #         mha_mask = np.expand_dims(mha_mask[:,0],1)
+    #     return torch.ByteTensor(mha_mask).detach()
