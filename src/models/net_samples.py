@@ -56,6 +56,10 @@ def main():
         net = SocialAttention(args_net)
     elif model == "spatial_attention":
         net = SpatialAttention(args_net)
+    elif model == "s2s_social_attention":
+        net = SocialAttention(args_net)
+    elif model == "s2s_spatial_attention":
+        net = SpatialAttention(args_net)
 
     # loading trained network
     net.load_state_dict(checkpoint['state_dict'])
