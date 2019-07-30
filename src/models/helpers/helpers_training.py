@@ -21,7 +21,9 @@ def load_data_loaders(parameters_project,prepare_param,training_param,net_params
     if training_param["set_type_test"] == "eval":
         test_scenes = eval_scenes
     
-
+    froze_cnn = 0
+    if "froze_cnn" in net_params:
+        froze_cnn = net_params["froze_cnn"]
 
     train_dataset = Hdf5Dataset(
         hdf5_file= data_file,
@@ -37,7 +39,7 @@ def load_data_loaders(parameters_project,prepare_param,training_param,net_params
         padding = prepare_param["padding"],
         use_images = net_params["use_images"],
         images_path = parameters_project["raw_images"],
-        froze_cnn= net_params["froze_cnn"]
+        froze_cnn= froze_cnn
         )
 
     eval_dataset = Hdf5Dataset(
@@ -55,7 +57,7 @@ def load_data_loaders(parameters_project,prepare_param,training_param,net_params
         padding = prepare_param["padding"],
         use_images = net_params["use_images"],
         images_path = parameters_project["raw_images"],
-        froze_cnn= net_params["froze_cnn"]
+        froze_cnn= froze_cnn
 
 
         )

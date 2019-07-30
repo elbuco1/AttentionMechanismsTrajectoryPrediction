@@ -48,6 +48,9 @@ class SpatialAttention(nn.Module):
         self.mha_dropout = args["mha_dropout"]
         self.joint_optimisation = args["joint_optimisation"]
         self.froze_cnn = args["froze_cnn"]
+        self.tfr_feed_forward_dim = args["tfr_feed_forward_dim"]
+        self.tfr_num_layers = args["tfr_num_layers"]
+
 
 ######## Dynamic part #####################################
 ############# CNN #########################################
@@ -66,10 +69,20 @@ class SpatialAttention(nn.Module):
         self.spatt2att = nn.Linear(self.spatial_projection,self.dmodel)
 
 ############# Attention #########################################
-        if self.use_mha:
+        if self.use_mha == 1:
+            print("Multihead attention")
             self.soft = soft_attention.MultiHeadAttention(self.device,self.dmodel,self.h,self.mha_dropout)
+            
+        elif self.use_mha == 2:
+            print("Transformer encoder")
+            encoder_layer = soft_attention.EncoderLayer(self.device,self.dmodel,self.h,self.mha_dropout, self.tfr_feed_forward_dim)
+            self.soft = soft_attention.Encoder(encoder_layer,self.tfr_num_layers)
+
         else:
+            print("Soft attention")
             self.soft = soft_attention.SoftAttention(self.device,self.dmodel,self.projection_layers,self.mha_dropout)
+
+
 
 # ############# Predictor #########################################
 

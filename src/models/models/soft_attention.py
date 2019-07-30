@@ -6,6 +6,7 @@ import numpy as np
 import torchvision
 import imp
 import time
+import copy
 
 
 class MultiHeadAttention(nn.Module):
@@ -16,14 +17,13 @@ class MultiHeadAttention(nn.Module):
         self.mha = nn.MultiheadAttention(dmodel,h,mha_dropout)
         self.h = h
 
-    def forward(self,q,k,v,points_mask = None, multiquery = 0):
+    def forward(self,q,k,v,points_mask = None):
         if points_mask is not None:
-            mask = self.get_mask(points_mask,q.size()[1]).to(self.device)
+            mask = self.get_mask(points_mask).to(self.device)
         else:
             mask = None
 
-        if not multiquery:
-            q = q[:,0].clone().unsqueeze(1)
+        
         q = q.permute(1,0,2)
         k = k.permute(1,0,2)
         v = v.permute(1,0,2)
@@ -32,13 +32,62 @@ class MultiHeadAttention(nn.Module):
         att = att.permute(1,0,2)
         return att #B,Nmax,dv
 
-    def get_mask(self,points_mask,max_batch):
+    def get_mask(self,points_mask):
         if len(points_mask.shape) < 4:
             print("please input size must be [b,n,s,i]")
             points_mask = np.expand_dims(points_mask, axis = 1)
 
         mha_mask = (np.sum(points_mask.reshape(points_mask.shape[0],points_mask.shape[1],-1), axis = 2) == 0).astype(int)
         return torch.ByteTensor(mha_mask).detach()
+
+class EncoderLayer(nn.Module):
+    def __init__(self,device,dmodel,h,mha_dropout, fforward_dim):
+        super(EncoderLayer,self).__init__()
+
+        self.mha = MultiHeadAttention(device,dmodel,h,mha_dropout)
+        self.linear1 = nn.Linear(dmodel, fforward_dim)
+        self.dropout = nn.Dropout(mha_dropout)
+        self.linear2 = nn.Linear(fforward_dim, dmodel)
+
+        self.norm1 = nn.LayerNorm(dmodel)
+        self.norm2 = nn.LayerNorm(dmodel)
+        self.dropout1 = nn.Dropout(mha_dropout)
+        self.dropout2 = nn.Dropout(mha_dropout)
+
+        self.device = device
+    def forward(self,q,k,v,points_mask = None):
+        x = self.mha(q,k,v,points_mask)
+        x = q + self.dropout1(x)
+        x = self.norm1(x)
+        x1 = f.relu(self.linear1(x))
+        x1 = self.dropout(x1)
+        x1 = f.relu(self.linear2(x1))
+        x = self.dropout2(x1) + x
+        x = self.norm2(x)
+        return x
+
+class Encoder(nn.Module):
+    def __init__(self,encoder_layer, num_layers):
+        super(Encoder,self).__init__()
+        self.layers = self._get_clones(encoder_layer,num_layers)
+        self.num_layers = num_layers
+    
+    def forward(self, q, k, v, points_mask = None):
+        
+        output = self.layers[0](q,k,v,points_mask)
+
+        for i in range(1,self.num_layers):
+            output = self.layers[i](output, output, output)
+        return output
+
+    
+    def _get_clones(self,module, N):
+        #https://pytorch.org/docs/master/_modules/torch/nn/modules/transformer.html
+        return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
+
+
+
+
 
 class LinearProjection(nn.Module):
     def __init__(self,device,dmodel,projection_layers ,dropout = 0.1):
@@ -92,15 +141,13 @@ class SoftAttention(nn.Module):
         
         self.mlp_attention = LinearProjection(device,dmodel,self.projection_layers,dropout = dropout)
 
-    def forward(self,q,k,v,points_mask = None, multiquery = 0):
+    def forward(self,q,k,v,points_mask = None):
         if points_mask is not None:
             mask = self.get_mask(points_mask).to(self.device)
 
         else:
             mask = None
 
-        if not multiquery:
-            q = q[:,0].unsqueeze(1)
         att = self.mlp_attention(q,k,v,mask)
         return att #B,Nmax,dv
     

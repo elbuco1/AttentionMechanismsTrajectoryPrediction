@@ -49,6 +49,9 @@ class SocialAttention(nn.Module):
 
         #prediction layers
         self.projection_layers = args["projection_layers"]
+        self.tfr_feed_forward_dim = args["tfr_feed_forward_dim"]
+        self.tfr_num_layers = args["tfr_num_layers"]
+
 
         self.use_mha = args["use_mha"]
         self.h = args["h"]
@@ -64,9 +67,17 @@ class SocialAttention(nn.Module):
         # self.conv2pred = nn.Linear(self.input_length*self.convnet_embedding,self.dmodel)
         self.conv2pred = nn.Linear(self.cnn_feat_size,self.dmodel)
 
-        if self.use_mha:
+        if self.use_mha == 1:
+            print("Multihead attention")
             self.soft = soft_attention.MultiHeadAttention(self.device,self.dmodel,self.h,self.mha_dropout)
+            
+        elif self.use_mha == 2:
+            print("Transformer encoder")
+            encoder_layer = soft_attention.EncoderLayer(self.device,self.dmodel,self.h,self.mha_dropout, self.tfr_feed_forward_dim)
+            self.soft = soft_attention.Encoder(encoder_layer,self.tfr_num_layers)
+
         else:
+            print("Soft attention")
             self.soft = soft_attention.SoftAttention(self.device,self.dmodel,self.projection_layers,self.mha_dropout)
 
 ############# Predictor #########################################
@@ -117,10 +128,11 @@ class SocialAttention(nn.Module):
         x = self.conv2att(conv_features) # B,Nmax,dmodel    
         x = f.relu(x)
 
-
-        att_feat = self.soft(x,x,x,points_mask, self.joint_optimisation)# B,Nmax,dmodel
         if not self.joint_optimisation:
+            q = x[:,0].clone().unsqueeze(1)
             conv_features = conv_features[:,0].unsqueeze(1)
+
+        att_feat = self.soft(q,x,x,points_mask)# B,Nmax,dmodel
 
 
 

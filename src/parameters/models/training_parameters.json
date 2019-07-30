@@ -9,7 +9,7 @@
     "test":0,
    
     "n_epochs" : 40,
-    "batch_size": 1 ,    
+    "batch_size": 32 ,    
     "lr" : 0.001, 
     "weight_decay":0,
 

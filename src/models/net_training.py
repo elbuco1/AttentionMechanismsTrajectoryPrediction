@@ -130,9 +130,10 @@ def main():
             "use_mha": net_params["use_mha"],
             "h": net_params["h"],
             "mha_dropout": net_params["mha_dropout"],
-            "joint_optimisation": training_parameters["joint_optimisation"]
+            "joint_optimisation": training_parameters["joint_optimisation"],
 
-
+            "tfr_feed_forward_dim": net_params["tfr_feed_forward_dim"],
+            "tfr_num_layers": net_params["tfr_num_layers"]
         }     
 
         net_type = SocialAttention
@@ -165,7 +166,10 @@ def main():
             "h": net_params["h"],
             "mha_dropout": net_params["mha_dropout"],
             "joint_optimisation": training_parameters["joint_optimisation"],
-            "froze_cnn": net_params["froze_cnn"]
+            "froze_cnn": net_params["froze_cnn"],
+            "tfr_feed_forward_dim": net_params["tfr_feed_forward_dim"],
+            "tfr_num_layers": net_params["tfr_num_layers"]
+
         }       
         net_type = SpatialAttention
     elif model_name == "s2s_social_attention":
@@ -230,7 +234,6 @@ def main():
         }       
         net_type = S2sSpatialAtt
 
-    print(args_net["froze_cnn"])
         
     # init neural network
     net = net_type(args_net)

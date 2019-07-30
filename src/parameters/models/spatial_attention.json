@@ -4,7 +4,9 @@
     "dmodel":128,
     "mha_dropout" : 0.1,
     "h":4,
-    "use_mha":0,
+    "use_mha":2,
+    "tfr_feed_forward_dim":2048,
+    "tfr_num_layers":3,
     
     
     "predictor_layers": [100],
