@@ -133,7 +133,9 @@ class SocialAttention(nn.Module):
         if not self.joint_optimisation:
             q = x[:,0].clone().unsqueeze(1)
             conv_features = conv_features[:,0].unsqueeze(1)
-
+        else:
+            q = x
+        
         att_feat = self.soft(q,x,x,points_mask)# B,Nmax,dmodel
 
 

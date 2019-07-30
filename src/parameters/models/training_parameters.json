@@ -23,5 +23,5 @@
 
     "offsets":1,
     "offsets_input":0,
-    "joint_optimisation":0
+    "joint_optimisation":1
 }

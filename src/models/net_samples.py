@@ -132,7 +132,11 @@ def main():
 
 
             else:
-                outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device)
+
+                if not args_net["joint_optimisation"]:
+                    outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device)
+                else:
+                    outputs = net((inputs,types,active_mask,points_mask,imgs))
 
             end = time.time() - start 
             times += end
