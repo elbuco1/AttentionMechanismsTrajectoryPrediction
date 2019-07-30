@@ -129,6 +129,9 @@ def get_active_mask(mask_target):
 
 def get_data_loader(parameters_project,data_file,scene,args_net,prepare_param,eval_params):
     
+    froze_cnn = 0
+    if "froze_cnn" in args_net:
+        froze_cnn = args_net["froze_cnn"]
     dataset = Hdf5Dataset(
         hdf5_file= data_file,
         scene_list= [scene],
@@ -143,7 +146,8 @@ def get_data_loader(parameters_project,data_file,scene,args_net,prepare_param,ev
         padding = prepare_param["padding"],
         evaluation = 1,
         use_images = args_net["use_images"],
-        images_path = parameters_project["raw_images"]
+        images_path = parameters_project["raw_images"],
+        froze_cnn = froze_cnn
         )
 
     data_loader = CustomDataLoader( batch_size = eval_params["batch_size"],shuffle = False,drop_last = False,dataset = dataset,test=0)
