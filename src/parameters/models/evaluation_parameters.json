@@ -1,7 +1,7 @@
 {
     "batch_size":1,
-    "model_name":"transformer",
-    "report_name":"transformer",
+    "model_name":"baseline",
+    "report_name":"baseline",
     "set_type_test":"test",
     "spatial_annotations": "./data/external/spatial_annotations/",
     "user_spatial_profile":{

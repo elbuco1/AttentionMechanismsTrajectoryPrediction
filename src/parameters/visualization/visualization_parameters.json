@@ -8,7 +8,8 @@
         "cnn_mlp",
         "social_attention",
         "spatial_var1",
-        "transformer"
+        "transformer",
+        "baseline"
     ],
     "metrics":[
         "ade_disjoint",

@@ -43,28 +43,36 @@ def main():
     models_path = parameters_project["models_evaluation"] + "{}.tar".format(model_name)
 
     print("loading trained model {}".format(model_name))
-    checkpoint = torch.load(models_path)
-    args_net = checkpoint["args"]
-    model = args_net["model_name"]  
-
     net = None
-    if model == "rnn_mlp":
-        net = RNN_MLP(args_net)
-    elif model == "cnn_mlp":        
-        net = CNN_MLP(args_net)     
-    elif model == "social_attention":
-        net = SocialAttention(args_net)
-    elif model == "spatial_attention":
-        net = SpatialAttention(args_net)
-    elif model == "s2s_social_attention":
-        net = SocialAttention(args_net)
-    elif model == "s2s_spatial_attention":
-        net = SpatialAttention(args_net)
+    if model_name == "baseline":
+        args_net = {
+            "offsets":0,
+            "offsets_input":0,
+            "use_images":0
+        }
+    else:
+        checkpoint = torch.load(models_path)
+        args_net = checkpoint["args"]
+        model = args_net["model_name"]  
 
-    # loading trained network
-    net.load_state_dict(checkpoint['state_dict'])
-    net = net.to(device)
-    net.eval()
+        net = None
+        if model == "rnn_mlp":
+            net = RNN_MLP(args_net)
+        elif model == "cnn_mlp":        
+            net = CNN_MLP(args_net)     
+        elif model == "social_attention":
+            net = SocialAttention(args_net)
+        elif model == "spatial_attention":
+            net = SpatialAttention(args_net)
+        elif model == "s2s_social_attention":
+            net = SocialAttention(args_net)
+        elif model == "s2s_spatial_attention":
+            net = SpatialAttention(args_net)
+
+        # loading trained network
+        net.load_state_dict(checkpoint['state_dict'])
+        net = net.to(device)
+        net.eval()
 
 
     scenes = test_scenes
@@ -116,30 +124,35 @@ def main():
             inputs = inputs.to(device)
             labels =  labels.to(device)
             imgs = imgs.to(device)
-
-            # active mask for training, along batch*numbr_agent axis
-            active_mask = active_mask.to(device)
-
-            points_mask = list(points_mask)
+            b,n,_,_ = inputs.shape
             if not args_net["offsets_input"]:
                 input_last = np.zeros_like(inputs.cpu().numpy()) 
+
             
-            b,n,_,_ = inputs.shape
+            outputs = labels
+            if model_name != "baseline":
+                # active mask for training, along batch*numbr_agent axis
+                active_mask = active_mask.to(device)
 
-            start = time.time()
-            if not args_net["use_neighbors"]:
-                outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_naive(inputs,types,active_mask,points_mask,net,device,imgs)
+                points_mask = list(points_mask)
+                if not args_net["offsets_input"]:
+                    input_last = np.zeros_like(inputs.cpu().numpy()) 
+                
+
+                start = time.time()
+                if not args_net["use_neighbors"]:
+                    outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_naive(inputs,types,active_mask,points_mask,net,device,imgs)
 
 
-            else:
-
-                if not args_net["joint_optimisation"]:
-                    outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device)
                 else:
-                    outputs = net((inputs,types,active_mask,points_mask,imgs))
 
-            end = time.time() - start 
-            times += end
+                    if not args_net["joint_optimisation"]:
+                        outputs,inputs,types,active_mask,points_mask = helpers_evaluation.predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device)
+                    else:
+                        outputs = net((inputs,types,active_mask,points_mask,imgs))
+
+                end = time.time() - start 
+                times += end
             nb_samples += b*n
 
             active_mask = helpers_evaluation.get_active_mask(points_mask[1])
@@ -150,7 +163,6 @@ def main():
 
             if not args_net["offsets"]:
                 target_last = np.zeros_like(labels.detach().cpu().numpy())
-
             for i,l,o,t,p, a, il, tl  in zip(inputs, labels, outputs, types, points_mask,active_mask, input_last, target_last):
 
                 i = i[a].detach().cpu().numpy()
