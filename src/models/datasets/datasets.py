@@ -448,51 +448,6 @@ class Hdf5Dataset():
                   nb_ids[-1] += 1
             return unique_ids,nb_ids
 
-      def __augment_batch(self, seq, rotation_matrices, translation_matrices):
-            b,n,s,i = seq.shape
-            _,r,_ = rotation_matrices.shape
-
-
-            rotation_matrices = np.expand_dims(rotation_matrices, 0)
-            translation_matrices = np.expand_dims(translation_matrices,  0)
-
-            rotation_matrices = np.repeat(rotation_matrices, n*s, axis = 0 )
-            translation_matrices = np.repeat(translation_matrices, n*s, axis = 0 )
-
-            rotation_matrices = np.transpose(rotation_matrices,(1,0,2,3))
-            translation_matrices = np.transpose(translation_matrices,(1,0,2))
-
-            rotation_matrices = rotation_matrices.reshape(b,n,s,r,r)
-            translation_matrices = translation_matrices.reshape(b,n,s,r)
-
-            # rotation_matrices = rotation_matrices.reshape(b*n*s,r,r)
-            # translation_matrices = translation_matrices.reshape(b*n*s,r)
-
-            seq = np.add(seq, translation_matrices)
-
-            seq = np.expand_dims(seq,  -1)
-
-            seq = np.matmul(rotation_matrices, seq)
-            seq = np.squeeze(seq,  -1)
-            seq = np.subtract(seq, translation_matrices )
-
-            # seq = seq.reshape(b,n,s, i)
-
-
-
-            
-
-            
-
-
-
-
-
-
-
-
-            return seq
-
       def __repeat_augmentation(self, scenes,seq,types, repetitions):
             rscenes, rseq, rtypes = [], [], []
             for scene, s, t, repetition in zip(scenes,seq,types, repetitions):
@@ -521,5 +476,37 @@ class Hdf5Dataset():
             translation_matrices *= -1
             return translation_matrices
 
+      def __augment_batch(self, seq, rotation_matrices, translation_matrices):
+            b,n,s,i = seq.shape
+            _,r,_ = rotation_matrices.shape
+            
+            real_positions = (seq != self.padding).astype(int)
+            
+            rotation_matrices = np.expand_dims(rotation_matrices, 0)
+            translation_matrices = np.expand_dims(translation_matrices,  0)
 
+            rotation_matrices = np.repeat(rotation_matrices, n*s, axis = 0 )
+            translation_matrices = np.repeat(translation_matrices, n*s, axis = 0 )
+
+            rotation_matrices = np.transpose(rotation_matrices,(1,0,2,3))
+            translation_matrices = np.transpose(translation_matrices,(1,0,2))
+
+            rotation_matrices = rotation_matrices.reshape(b,n,s,r,r)
+            translation_matrices = translation_matrices.reshape(b,n,s,r)
+
+            translation_matrices = np.multiply(real_positions,translation_matrices)
+            real_positions = np.expand_dims(real_positions, -1)
+            rotation_matrices = np.multiply(real_positions,rotation_matrices)
+
+
+
+            seq = np.add(seq, translation_matrices)
+
+            seq = np.expand_dims(seq,  -1)
+
+            seq = np.matmul(rotation_matrices, seq)
+            seq = np.squeeze(seq,  -1)
+            seq = np.subtract(seq, translation_matrices )
+
+            return seq
       
