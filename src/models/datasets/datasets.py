@@ -110,8 +110,10 @@ class Hdf5Dataset():
             self.padding = padding
 
             if self.data_augmentation:      
+                  self.augmentation_angles = [0, 90, 180, 270]           
                   self.scene_centers = self.__get_scenes_centers()
                   self.rotation_matrices = self.__get_matrices()
+
 
             self.shape = self.coord_dset.shape
             if self.use_images:
@@ -119,18 +121,24 @@ class Hdf5Dataset():
                         self.images = self.__load_images_features()
                   else:
                         self.images = self.__load_images()
-                        
 
             
       def __del__(self):
             self.hdf5_file.close()
       def get_len(self):
-            return self.shape[0]
+            if self.data_augmentation:
+                  return self.shape[0] * len(self.augmentation_angles)
+            else:
+                  return self.shape[0]
 
       
 
 
       def get_ids(self,ids):
+            if self.data_augmentation:
+                  ids, matrices_ids = self.__get_real_ids(ids)
+                  ids,repetitions = self.__augmented_ids_repetition(ids)
+
             types,X,y,seq = [],[],[],[]
             max_batch = self.coord_dset.shape[1]
  
@@ -139,6 +147,22 @@ class Hdf5Dataset():
                   scenes = [img.decode('UTF-8') for img in self.scenes_dset[ids]]
             
             seq = self.coord_dset[ids]
+            if self.use_neighbors:
+                  types = self.types_dset[ids,:max_batch] #B,N,tpred,2
+            else:
+                  types =  self.types_dset[ids,0] #B,1,tpred,2
+            
+            
+            if self.data_augmentation:
+                  scenes, seq, types = self.__repeat_augmentation(scenes,seq,types, repetitions)
+                  rotation_matrices = self.__get_rotation_matrices(matrices_ids)
+                  translation_matrices = self.__get_translation_matrices(scenes)
+                  seq = self.__augment_batch(seq, rotation_matrices, translation_matrices)
+
+
+
+            
+
             X = seq[:,:,:self.t_obs]
             y = seq[:,:,self.t_obs:self.seq_len]
 
@@ -150,11 +174,7 @@ class Hdf5Dataset():
             y = y[:,:max_batch]
             seq = seq[:,:max_batch]
 
-            if self.use_neighbors:
-                  types = self.types_dset[ids,:max_batch] #B,N,tpred,2
-            else:
-                  types =  self.types_dset[ids,0] #B,1,tpred,2
-                  
+            
 
 
             points_mask = []
@@ -365,6 +385,16 @@ class Hdf5Dataset():
                   v = int(v/2)
                   return (v,v+1)
 
+
+
+
+
+
+
+
+
+
+      #### Data augmentation methods #####
       def __get_scenes_centers(self):
             centers = {}
             for scene in self.scene_list:
@@ -378,9 +408,10 @@ class Hdf5Dataset():
                   center = (width_middle, height_middle)
                   centers[scene] = center    
             return centers
-      def __get_matrices(self, angles = [0, 90, 180, 270], divisible_by = 90):
+
+      def __get_matrices(self, divisible_by = 90):
             rotation_matrices = {}
-            for i, theta in enumerate(angles):
+            for i, theta in enumerate(self.augmentation_angles):
                   assert theta % divisible_by == 0
                   rotation_matrices[i] = self.__get_matrix(theta)
             return rotation_matrices
@@ -393,6 +424,102 @@ class Hdf5Dataset():
                         [s,c]
                         ])
             return r
+      
+      def __get_real_ids(self, augmented_ids):
+            ids = np.array(augmented_ids) % self.shape[0]
+            theta_ids = (np.array(augmented_ids) / self.shape[0]).astype(int)
 
-      def __augment_batch(self, X, y):
-            pass
+            for id_ in ids:
+                  assert id_ > -1 and id_ < self.shape[0]
+
+            arg_ids = np.argsort(ids)
+            ids = ids[arg_ids]
+            theta_ids = theta_ids[arg_ids]
+
+            return ids.tolist(), theta_ids.tolist()
+
+      def __augmented_ids_repetition(self, augmented_ids ):
+            unique_ids = []
+            nb_ids = []
+            for id_ in augmented_ids:
+                  if id_ not in unique_ids:
+                        unique_ids.append(id_)
+                        nb_ids.append(0)
+                  nb_ids[-1] += 1
+            return unique_ids,nb_ids
+
+      def __augment_batch(self, seq, rotation_matrices, translation_matrices):
+            b,n,s,i = seq.shape
+            _,r,_ = rotation_matrices.shape
+
+
+            rotation_matrices = np.expand_dims(rotation_matrices, 0)
+            translation_matrices = np.expand_dims(translation_matrices,  0)
+
+            rotation_matrices = np.repeat(rotation_matrices, n*s, axis = 0 )
+            translation_matrices = np.repeat(translation_matrices, n*s, axis = 0 )
+
+            rotation_matrices = np.transpose(rotation_matrices,(1,0,2,3))
+            translation_matrices = np.transpose(translation_matrices,(1,0,2))
+
+            rotation_matrices = rotation_matrices.reshape(b,n,s,r,r)
+            translation_matrices = translation_matrices.reshape(b,n,s,r)
+
+            # rotation_matrices = rotation_matrices.reshape(b*n*s,r,r)
+            # translation_matrices = translation_matrices.reshape(b*n*s,r)
+
+            seq = np.add(seq, translation_matrices)
+
+            seq = np.expand_dims(seq,  -1)
+
+            seq = np.matmul(rotation_matrices, seq)
+            seq = np.squeeze(seq,  -1)
+            seq = np.subtract(seq, translation_matrices )
+
+            # seq = seq.reshape(b,n,s, i)
+
+
+
+            
+
+            
+
+
+
+
+
+
+
+
+            return seq
+
+      def __repeat_augmentation(self, scenes,seq,types, repetitions):
+            rscenes, rseq, rtypes = [], [], []
+            for scene, s, t, repetition in zip(scenes,seq,types, repetitions):
+                  for _ in range(repetition):
+                        rscenes.append(scene)
+                        rseq.append(s)
+                        rtypes.append(t)
+            seq = np.array(rseq)
+            types = np.array(rtypes)
+            return scenes,seq,types
+
+      def __get_rotation_matrices(self, matrices_ids):
+            matrices = []
+            for id_ in matrices_ids:
+                  matrices.append(self.rotation_matrices[id_])
+            matrices = np.array(matrices)
+            return matrices
+
+      def __get_translation_matrices(self, scenes):
+            translation_matrices = []
+            
+            for scene in scenes:
+                  translation_matrix = list(self.scene_centers[scene])      
+                  translation_matrices.append(translation_matrix)
+            translation_matrices = np.array(translation_matrices)
+            translation_matrices *= -1
+            return translation_matrices
+
+
+      
