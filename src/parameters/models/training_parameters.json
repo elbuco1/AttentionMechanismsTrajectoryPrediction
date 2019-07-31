@@ -8,7 +8,7 @@
     "train":1,
     "test":0,
    
-    "n_epochs" : 40,
+    "n_epochs" : 50,
     "batch_size": 32 ,    
     "lr" : 0.001, 
     "weight_decay":0,
@@ -23,6 +23,6 @@
 
     "offsets":1,
     "offsets_input":0,
-    "joint_optimisation":1,
+    "joint_optimisation":0,
     "data_augmentation":1
 }

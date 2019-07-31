@@ -176,6 +176,7 @@ class NetTraining():
 
             # print batch loss <-- mean batch loss for last print_every timesteps
             if batch_idx % self.print_every == 0:
+                torch.cuda.synchronize()
                 print(batch_idx,loss.item(),time.time()-start_time)     
         
         epoch_loss = np.mean(batches_loss)  

@@ -135,6 +135,7 @@ class Hdf5Dataset():
 
 
       def get_ids(self,ids):
+
             if self.data_augmentation:
                   ids, matrices_ids = self.__get_real_ids(ids)
                   ids,repetitions = self.__augmented_ids_repetition(ids)
@@ -457,7 +458,7 @@ class Hdf5Dataset():
                         rtypes.append(t)
             seq = np.array(rseq)
             types = np.array(rtypes)
-            return scenes,seq,types
+            return rscenes,seq,types
 
       def __get_rotation_matrices(self, matrices_ids):
             matrices = []
@@ -481,17 +482,19 @@ class Hdf5Dataset():
             _,r,_ = rotation_matrices.shape
             
             real_positions = (seq != self.padding).astype(int)
-            
+                       
             rotation_matrices = np.expand_dims(rotation_matrices, 0)
             translation_matrices = np.expand_dims(translation_matrices,  0)
 
             rotation_matrices = np.repeat(rotation_matrices, n*s, axis = 0 )
             translation_matrices = np.repeat(translation_matrices, n*s, axis = 0 )
 
+
             rotation_matrices = np.transpose(rotation_matrices,(1,0,2,3))
             translation_matrices = np.transpose(translation_matrices,(1,0,2))
 
             rotation_matrices = rotation_matrices.reshape(b,n,s,r,r)
+
             translation_matrices = translation_matrices.reshape(b,n,s,r)
 
             translation_matrices = np.multiply(real_positions,translation_matrices)
