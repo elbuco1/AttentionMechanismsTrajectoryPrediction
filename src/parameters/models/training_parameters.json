@@ -23,5 +23,6 @@
 
     "offsets":1,
     "offsets_input":0,
-    "joint_optimisation":1
+    "joint_optimisation":1,
+    "data_augmentation":1
 }

@@ -41,6 +41,8 @@ def main():
     training_parameters = json.load(open(parameters_project["training_parameters"])) 
     models_parameters = json.load(open(parameters_project["models_parameters"])) 
     processed_parameters = json.load(open(parameters_project["data_processed_parameters"]))
+    raw_parameters = json.load(open(parameters_project["data_raw_parameters"]))
+
 
     # loading training data
     data_file = parameters_project["training_hdf5"]
@@ -241,7 +243,7 @@ def main():
     # init neural network
     net = net_type(args_net)
 
-    train_loader,eval_loader,_,_ = helpers.load_data_loaders(parameters_project, processed_parameters,training_parameters,args_net,data_file,scenes)
+    train_loader,eval_loader,_,_ = helpers.load_data_loaders(parameters_project, raw_parameters, processed_parameters,training_parameters,args_net,data_file,scenes)
     
     net = net.to(device)
     optimizer = optim.Adam(net.parameters(),lr = training_parameters["lr"],weight_decay=training_parameters["weight_decay"])

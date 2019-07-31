@@ -12,7 +12,7 @@ from matplotlib.lines import Line2D
 import random 
 
 
-def load_data_loaders(parameters_project,prepare_param,training_param,net_params,data_file,scenes):
+def load_data_loaders(parameters_project, raw_parameters, prepare_param,training_param,net_params,data_file,scenes):
     train_eval_scenes,train_scenes,test_scenes,eval_scenes = scenes
 
        
@@ -39,7 +39,9 @@ def load_data_loaders(parameters_project,prepare_param,training_param,net_params
         padding = prepare_param["padding"],
         use_images = net_params["use_images"],
         images_path = parameters_project["raw_images"],
-        froze_cnn= froze_cnn
+        froze_cnn= froze_cnn,
+        pixel_to_meters = raw_parameters["pixel_meter_ratios"],
+        data_augmentation = training_param["data_augmentation"]
         )
 
     eval_dataset = Hdf5Dataset(

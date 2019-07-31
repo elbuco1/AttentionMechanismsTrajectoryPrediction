@@ -64,8 +64,9 @@ class CustomDataLoader():
 """
 class Hdf5Dataset():
       'Characterizes a dataset for PyTorch'
-      def __init__(self,padding,hdf5_file,scene_list,t_obs,t_pred,set_type, data_type,use_neighbors,use_images,images_path,froze_cnn = 1,
-                  use_masks = False,reduce_batches = True, predict_offsets = 0,offsets_input = 0,evaluation = 0):
+      def __init__(self,padding,hdf5_file,scene_list,t_obs,t_pred,set_type, data_type,use_neighbors,use_images,images_path,
+                  pixel_to_meters = {}, froze_cnn = 1, use_masks = False,reduce_batches = True, predict_offsets = 0, 
+                  offsets_input = 0,evaluation = 0, data_augmentation = False):
             
             self.froze_cnn = froze_cnn
             self.use_images = use_images   
@@ -85,6 +86,9 @@ class Hdf5Dataset():
             self.offsets_input = offsets_input
 
             self.hdf5_file = h5py.File(hdf5_file,"r")
+            self.pixel_to_meters = pixel_to_meters
+
+            self.data_augmentation = data_augmentation
 
             if self.evaluation:
                   self.dset_name = self.scene_list[0]
@@ -104,7 +108,10 @@ class Hdf5Dataset():
             self.t_pred = t_pred
             self.seq_len = t_obs + t_pred
             self.padding = padding
-                     
+
+            if self.data_augmentation:      
+                  self.scene_centers = self.__get_scenes_centers()
+                  self.rotation_matrices = self.__get_matrices()
 
             self.shape = self.coord_dset.shape
             if self.use_images:
@@ -272,7 +279,8 @@ class Hdf5Dataset():
 
 
             return X,y,(active_mask_in,active_mask),active_last_points,original_x
-
+      
+      
       def __load_images_features(self):#cuda
             images = {}
             print("loading images features")
@@ -356,3 +364,35 @@ class Hdf5Dataset():
             else:
                   v = int(v/2)
                   return (v,v+1)
+
+      def __get_scenes_centers(self):
+            centers = {}
+            for scene in self.scene_list:
+                  img = Image.open(self.images_path.format(scene))
+                  pixel_to_meter = self.pixel_to_meters[scene]
+                  width, height = img.size 
+                  width_meter = pixel_to_meter * width
+                  height_meter = pixel_to_meter * height
+                  width_middle = int(width_meter/2.0 * 10**2) / 10 ** 2
+                  height_middle = int(height_meter/2.0 * 10**2) / 10**2
+                  center = (width_middle, height_middle)
+                  centers[scene] = center    
+            return centers
+      def __get_matrices(self, angles = [0, 90, 180, 270], divisible_by = 90):
+            rotation_matrices = {}
+            for i, theta in enumerate(angles):
+                  assert theta % divisible_by == 0
+                  rotation_matrices[i] = self.__get_matrix(theta)
+            return rotation_matrices
+
+      def __get_matrix(self, theta_deg):
+            theta_rad = np.radians(theta_deg)
+            c, s = int(np.cos(theta_rad)), int(np.sin(theta_rad))
+            r = np.array([
+                        [c,-s],
+                        [s,c]
+                        ])
+            return r
+
+      def __augment_batch(self, X, y):
+            pass
