@@ -1,26 +1,26 @@
 {
     "input_dim":2,
 
-    "dmodel":128,
+    "dmodel":32,
     "mha_dropout" : 0.1,
     "h":4,
-    "use_mha":2,
+    "use_mha":0,
     "tfr_feed_forward_dim":2048,
     "tfr_num_layers":3,
     
     
-    "predictor_layers": [100],
+    "predictor_layers": [100,100],
     
 
-    "spatial_projection": 32,
+    "spatial_projection": 512,
     
     
     "nb_conv":2,
-    "nb_kernel":32,
-    "cnn_feat_size":32,
+    "nb_kernel":128,
+    "cnn_feat_size":64,
     "kernel_size":5,
     
-    "projection_layers":[32, 64, 32, 16],
+    "projection_layers":[128, 256, 128, 64],
     
     "use_neighbors": 0,
     "use_images": 1,

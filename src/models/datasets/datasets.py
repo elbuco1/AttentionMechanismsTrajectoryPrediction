@@ -148,6 +148,9 @@ class Hdf5Dataset():
                   scenes = [img.decode('UTF-8') for img in self.scenes_dset[ids]]
             
             seq = self.coord_dset[ids]
+            if self.reduce_batches:
+                  max_batch = self.__get_batch_max_neighbors(seq)
+
             if self.use_neighbors:
                   types = self.types_dset[ids,:max_batch] #B,N,tpred,2
             else:
@@ -168,8 +171,7 @@ class Hdf5Dataset():
             y = seq[:,:,self.t_obs:self.seq_len]
 
             # compute max nb of agents in a frame
-            if self.reduce_batches:
-                  max_batch = self.__get_batch_max_neighbors(X)
+            
 
             X = X[:,:max_batch]
             y = y[:,:max_batch]

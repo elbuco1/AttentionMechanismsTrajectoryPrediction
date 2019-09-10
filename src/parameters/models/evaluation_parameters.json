@@ -1,7 +1,7 @@
 {
     "batch_size":1,
-    "model_name":"baseline",
-    "report_name":"baseline",
+    "model_name":"cnn_pres",
+    "report_name":"cnn_pres",
     "set_type_test":"test",
     "spatial_annotations": "./data/external/spatial_annotations/",
     "user_spatial_profile":{

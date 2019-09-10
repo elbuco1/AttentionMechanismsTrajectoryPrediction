@@ -267,6 +267,7 @@ def predict_neighbors_disjoint(inputs,types,active_mask,points_mask,net,device):
 def predict_naive(inputs,types,active_mask,points_mask,net,device,imgs):
     b,n,s,i = points_mask[0].shape
     b,n,p,i = points_mask[1].shape
+    # types = types[active_mask]
 
     inputs = inputs.view(-1,s,i).unsqueeze(1)
     imgs = imgs.repeat(inputs.size()[0],1,1,1)

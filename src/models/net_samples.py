@@ -2,6 +2,10 @@ from models.rnn_mlp import RNN_MLP
 from models.social_attention import SocialAttention
 from models.cnn_mlp import CNN_MLP
 from models.spatial_attention import SpatialAttention
+from models.s2s_spatial_attention import S2sSpatialAtt
+from models.s2s_social_attention import S2sSocialAtt
+
+
 
 
 
@@ -67,7 +71,7 @@ def main():
         elif model == "s2s_social_attention":
             net = SocialAttention(args_net)
         elif model == "s2s_spatial_attention":
-            net = SpatialAttention(args_net)
+            net = S2sSpatialAtt(args_net)
 
         # loading trained network
         net.load_state_dict(checkpoint['state_dict'])
@@ -135,8 +139,8 @@ def main():
                 active_mask = active_mask.to(device)
 
                 points_mask = list(points_mask)
-                if not args_net["offsets_input"]:
-                    input_last = np.zeros_like(inputs.cpu().numpy()) 
+                # if not args_net["offsets_input"]:
+                #     input_last = np.zeros_like(inputs.cpu().numpy()) 
                 
 
                 start = time.time()

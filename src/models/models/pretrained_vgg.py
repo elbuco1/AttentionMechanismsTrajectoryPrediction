@@ -21,8 +21,8 @@ class customCNN1(nn.Module):
         super(customCNN1,self).__init__()
 
         # For mobilenet_v2 uncomment following
-        self.cnn = torchvision.models.mobilenet_v2(pretrained=True).features #mobilenet
-        # self.cnn = torchvision.models.vgg19(pretrained=True).features #vgg19
+        # self.cnn = torchvision.models.mobilenet_v2(pretrained=True).features #mobilenet
+        self.cnn = torchvision.models.vgg19(pretrained=True).features #vgg19
 
         # self.cnn = torchvision.models.segmentation.fcn_resnet101(pretrained=True).backbone #semantic segmentation
         # print(self.cnn)
@@ -41,8 +41,8 @@ class customCNN1(nn.Module):
         cnn_features = self.reduce_layer(x)
         return cnn_features
 class customCNN2(nn.Module):
-    def __init__(self,device, nb_channels_out = 1280,nb_channels_projection = 128): #mobilenet
-    # def __init__(self,device, nb_channels_out = 512,nb_channels_projection = 128): #vgg19
+    # def __init__(self,device, nb_channels_out = 1280,nb_channels_projection = 128): #mobilenet
+    def __init__(self,device, nb_channels_out = 512,nb_channels_projection = 128): #vgg19
     # def __init__(self,device, nb_channels_out = 2048,nb_channels_projection = 128): #segmentation
 
         super(customCNN2,self).__init__()
@@ -55,8 +55,8 @@ class customCNN2(nn.Module):
 
 
 class customCNN(nn.Module):
-    def __init__(self,device, nb_channels_out = 1280,nb_channels_projection = 128): #mobilenet
-    # def __init__(self,device, nb_channels_out = 512,nb_channels_projection = 128): #vgg19
+    # def __init__(self,device, nb_channels_out = 1280,nb_channels_projection = 128): #mobilenet
+    def __init__(self,device, nb_channels_out = 512,nb_channels_projection = 128): #vgg19
     # def __init__(self,device, nb_channels_out = 2048,nb_channels_projection = 128): #segmentation
 
         super(customCNN,self).__init__()
@@ -64,8 +64,8 @@ class customCNN(nn.Module):
         self.nb_channels_out = nb_channels_out   
 
         # For mobilenet_v2 uncomment following
-        self.cnn = torchvision.models.mobilenet_v2(pretrained=True).features #mobilenet
-        # self.cnn = torchvision.models.vgg19(pretrained=True).features #vgg19
+        # self.cnn = torchvision.models.mobilenet_v2(pretrained=True).features #mobilenet
+        self.cnn = torchvision.models.vgg19(pretrained=True).features #vgg19
 
         self.reduce_layer = nn.AdaptiveAvgPool2d((7,7))
         

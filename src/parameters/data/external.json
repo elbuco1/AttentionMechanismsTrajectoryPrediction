@@ -2,7 +2,12 @@
     "used_scenes": [
         "deathCircle",
         "gates",
-        "little"
+        "little",
+        "bookstore",
+        "coupa",
+        "hyang",
+        "nexus",
+        "quad"
     ],
     "types": {
         "biker": "bicycle",

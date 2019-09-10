@@ -71,22 +71,22 @@ def main():
         json.dump(dynamic_losses,open(dir_name + "dynamic_losses.json","w"),indent=2)
 
 
-        print("social conflicts distribution")
-        conflicts_distrib_results = helpers_evaluation.get_distrib_conflicts(scene_files)
-        helpers_evaluation.convert_losses(losses,"social_wsstn_",conflicts_distrib_results)
+        # print("social conflicts distribution")
+        # conflicts_distrib_results = helpers_evaluation.get_distrib_conflicts(scene_files)
+        # helpers_evaluation.convert_losses(losses,"social_wsstn_",conflicts_distrib_results)
 
        
-        print("social_conflicts")
-        conflict_threshold = evaluation_parameters["conflict_thresholds"]
-        social_results = helpers_evaluation.social_conflicts(scene_files,conflict_threshold)
-        helpers_evaluation.convert_losses(losses,"social_",social_results)
+        # print("social_conflicts")
+        # conflict_threshold = evaluation_parameters["conflict_thresholds"]
+        # social_results = helpers_evaluation.social_conflicts(scene_files,conflict_threshold)
+        # helpers_evaluation.convert_losses(losses,"social_",social_results)
 
-        print(time.time()-start)
+        # print(time.time()-start)
 
-        print("spatial_conflicts")
-        spatial_conflicts_results = helpers_evaluation.spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_profiles,pixel_meter_ratios)
-        print(time.time()-start)
-        helpers_evaluation.convert_losses(losses,"spatial_",spatial_conflicts_results)
+        # print("spatial_conflicts")
+        # spatial_conflicts_results = helpers_evaluation.spatial(scene_files,types_to_spatial,images,spatial_annotations,spatial_profiles,pixel_meter_ratios)
+        # print(time.time()-start)
+        # helpers_evaluation.convert_losses(losses,"spatial_",spatial_conflicts_results)
 
         print("spatial histograms")
         scenes_dimensions = helpers_evaluation.get_scene_dimensions(scenes, images, pixel_meter_ratios)

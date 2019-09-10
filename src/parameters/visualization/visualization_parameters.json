@@ -3,13 +3,11 @@
     "sample_id": 30 ,
     "report_name":"cnn_mlp",
     "models":[
-        "rnn_mlp",
+        "rnn_pres",
         
-        "cnn_mlp",
-        "social_attention",
-        "spatial_var1",
-        "transformer",
-        "baseline"
+        "cnn_pres",
+        "s2s_spatial_pres",
+        "spatial_soft_pres"
     ],
     "metrics":[
         "ade_disjoint",

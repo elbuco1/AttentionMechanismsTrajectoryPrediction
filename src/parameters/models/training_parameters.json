@@ -1,16 +1,16 @@
 {
 
-    "model":"social_attention",
-    "set_type_train": "train",
-    "set_type_test": "eval",
+    "model":"rnn_mlp",
+    "set_type_train": "train_eval",
+    "set_type_test": "test",
     "load_path" : "",  
 
     "train":1,
     "test":0,
    
-    "n_epochs" : 50,
+    "n_epochs" : 100,
     "batch_size": 32 ,    
-    "lr" : 0.001, 
+    "lr" : 0.0001, 
     "weight_decay":0,
 
     
@@ -24,5 +24,5 @@
     "offsets":1,
     "offsets_input":0,
     "joint_optimisation":0,
-    "data_augmentation":1
+    "data_augmentation":0
 }

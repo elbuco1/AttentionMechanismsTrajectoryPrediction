@@ -20,35 +20,35 @@ def main():
     
 
     # social loss
-    social_0 = []
-    social_5 = []
-    social_1 = []
+    # social_0 = []
+    # social_5 = []
+    # social_1 = []
 
-    for model in models_list:
-        losses = json.load(open(dir_name.format(model)+"losses.json"))
-        social_0.append(100*losses["global"]["social_joint_0.1"])
-        social_5.append(100*losses["global"]["social_joint_0.5"])
-        social_1.append(100*losses["global"]["social_joint_1.0"])
+    # for model in models_list:
+    #     losses = json.load(open(dir_name.format(model)+"losses.json"))
+    #     social_0.append(100*losses["global"]["social_joint_0.1"])
+    #     social_5.append(100*losses["global"]["social_joint_0.5"])
+    #     social_1.append(100*losses["global"]["social_joint_1.0"])
 
     
     
-    socials = np.array([social_0,social_5,social_1])
+    # socials = np.array([social_0,social_5,social_1])
     
-    unit = ["0.1","0.5","1.0"]
+    # unit = ["0.1","0.5","1.0"]
     
 
-    fig, ax = plt.subplots()
+    # fig, ax = plt.subplots()
     
-    for i in range( socials.shape[1]):
-        ax.plot(unit,socials[:,i], label = models_list[i])
-    # axs[0].plot(unit,socials[:,1])
-    ax.set_title('Social metrics')
-    ax.set(xlabel='distance threshold (m)', ylabel='conflict percentage')
-    ax.legend()
+    # for i in range( socials.shape[1]):
+    #     ax.plot(unit,socials[:,i], label = models_list[i])
+    # # axs[0].plot(unit,socials[:,1])
+    # ax.set_title('Social metrics')
+    # ax.set(xlabel='distance threshold (m)', ylabel='conflict percentage')
+    # ax.legend()
 
-    fig.tight_layout()
-    plt.savefig(save_dir+"social_losses.png")
-    plt.close()
+    # fig.tight_layout()
+    # plt.savefig(save_dir+"social_losses.png")
+    # plt.close()
     # ade fde 
     ade = []
     fde = []
@@ -95,23 +95,23 @@ def main():
 
     # spatial mask
     
-    fig, ax = plt.subplots()
+    # fig, ax = plt.subplots()
 
-    spatial = []
-    for model in models_list:
-        losses = json.load(open(dir_name.format(model)+"losses.json"))
-        spatial.append(float(losses["global"]["spatial_pred"])*100)
+    # spatial = []
+    # for model in models_list:
+    #     losses = json.load(open(dir_name.format(model)+"losses.json"))
+    #     spatial.append(float(losses["global"]["spatial_pred"])*100)
         
     
 
-    pos = np.arange(len(spatial))
-    ax.bar(pos,  spatial )
-    ax.set_xticks( pos)
-    ax.set_xticklabels(models_list)
+    # pos = np.arange(len(spatial))
+    # ax.bar(pos,  spatial )
+    # ax.set_xticks( pos)
+    # ax.set_xticklabels(models_list)
 
-    fig.tight_layout()
-    plt.savefig(save_dir+"spatial_losses.png")
-    plt.close()
+    # fig.tight_layout()
+    # plt.savefig(save_dir+"spatial_losses.png")
+    # plt.close()
 
     # spatial distrib
 
