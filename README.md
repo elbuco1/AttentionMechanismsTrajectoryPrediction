@@ -28,11 +28,21 @@ A whole lot of models have been proposed to use those informations for trajector
 
 The purpose of such mechanisms is to select automatically, based on the prediction context, which elements from a set of observations are relevant for the current prediction. For instance in NLP, one main task is language translation, which consists in given an input sentence in a language, to output its translation in another language. In this context, the set of elements is made of the words of the input sentence. At prediction time, the words from the output sentence are predicted sequentially. Attention mechanisms come from the observation that for a given predicted word, not every word in the input sentence is relevant. Therefore, attention mechanisms can be used to select which input words are relevant for every predicted word, making it possible to modify the input based on context.
 
+In trajectory prediction, attention mechanisms are used for taking into account two things: on one hand for social interactions, on the other hand for spatial interactions. In the case of social interactions, attention mechanisms are used to select which agents must be considered from the surrounding of the agent we want to predict the future position. In the case of spatial interactions, attention mechanisms are used to select which physical part of the scene (based on a top-view image) might have an impact on the future trajectory of the agent.
+
+
+
+### Goals of the project
+
+The main goal of this project was to evaluate the attention mechanisms already used for trajectory prediction. The attention mechanism were transposed somewhat "naïvely" from NLP to trajectory prediction. We modify those models and try to reduce drastically the computing time while keeping the same prediction quality, showing that such transposition was indeed naïve.
+
+While addressing this goal, we started to question the evaluation settings and in particular the relevance of the metrics used to evaluate such models. We therefore try to propose a new set of metrics to enrich the comparison of models.
+
+Finally despite the claims of previous studies, that such models could take into account social and spatial interactions we try to show that it might not be the case (in the continuity of https://arxiv.org/abs/1903.07933?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+arxiv%2FQSXk+%28ExcitingAds%21+cs+updates+on+arXiv.org%29).
+
 soft-attention-> differentiable  how does it work
 How was it transposed from NLP to trajectory prediction.
 Naive transposition -> better ways to transpose
                     -> does it actually work
 
-### Goals of the project
-
-The main goal of this project was first to evaluate the attention mechanisms already used 
+(étude des poids d'attention obtenus) étude qualitative sur un sous-ensemble de scènes
