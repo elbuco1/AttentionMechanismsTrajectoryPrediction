@@ -10,10 +10,19 @@ It has been shown that predicting recursively the future trajectory leads to an 
 
 Finally, it's been shown that against all expectations, using a Convolutionnal Neural Network (CNN) along the temporal dimension instead of Recurrent Neural Network (RNN) gives slightly better results when predicting the future trajectory and is way faster due to the fact that convolution operations can be made in parallel whereas operations in an RNN are made sequentially. We refer in this project to this model as CNN-MLP.
 
+All three models are implemented in this project and referred as seq2seq, rnn-mlp and cnn-mlp.
+
 #### Using the environment
-Crossing knowledge between scenes -> generalization
-social interactions
-spatial interactions
+One main research question in this field, is to train a model on a set of scenes and test it on a new set of scenes. In other words, we want a model capable of generalizing its learning across different and unseen environments.
+
+It is obvious that such a challenge can't be overcome using only past observed trajectory as input for our models. In fact, when an agent crosses a scene, the scene has an influence on its motion. The agent interacts with the scene. Mainly two types of interactions are addressed in the litterature:
+Social interactions refer to the influence the interactions between an agent and its surrounding agents have on their motions. 
+
+Spatial interactions refer to the influence between an agent and the physical constraints of a scene (such as roads, trees, obstacles ...) on the agent motion.
+
+A model good enough to generalize knowledge to a new set of scenes should be able to make good use of those interactions.
+
+
 attention mechanisms 
 NLP 
 Computer vision
