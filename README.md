@@ -48,7 +48,21 @@ Previous studies using attention mechanisms for trajectory prediction are based 
 
 [insérer image]
 
-### The baseline for attentive prediction
+### The baseline for attentive trajectory prediction
+
+In the litterature, all the models for attentive trajectory prediction are based upon the sequence-to-sequence architecture. First the observed trajectory of the agent we want to predict the next position is fed into an LSTM (the encoder) that extracts automatically a fixed-size attribute vector. This vector is used to initialize the hidden state of another LSTM (the decoder) which will be used to predict the following positions. The hidden state of the decoder represents the prediction context. It is first initialized based on the observed trajectory and then updated gradually as we go along the prediction process. The main difference between the "naïve" sequence-to-sequence model and the attentive one takes place during the prediction part. Before, we were taking as decoder input either the last position of the observed trajectory or the last predicted position and so on recursively. In the attentive alternative, for each prediction, we call the soft-attention module and concatenate the attention vector to the decoder regular input. 
+
+[insérer image] 
+
+One thing to notice is that the module is called for every prediction. This comes from the natural language processing use of this model, for instance for language prediction where it is apropos to select the relevant words in the input sentence for every predicted word.
+Another thing is that only the first parameter of the attention module changes from one call to another. It is the parameter Q from the previous paragraph, namely the prediction context. The value of the prediction context is the current decoder hidden state. The second parameter, namely the set of element whose relevance is to be evaluated, doesn't change from one call to another.
+
+#### Set of element for social attention
+
+#### Set of element for spatial attention
+
+#### Relevance of naïve transposition from NLP
+
 
 
 How was it transposed from NLP to trajectory prediction.
