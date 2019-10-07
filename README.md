@@ -44,7 +44,7 @@ Finally despite the claims of previous studies, that such models could take into
 ## Study
 ### Baselines
 #### Soft-attention
-Previous studies using attention mechanisms for trajectory prediction are based on its soft-attention variant. The soft-attention can be seen as a function of two inputs Q and V_{i}. 
+Previous studies using attention mechanisms for trajectory prediction are based on its soft-attention variant. The soft-attention can be seen as a function of two inputs Q and V_i. 
 soft-attention-> differentiable  how does it work
 How was it transposed from NLP to trajectory prediction.
 Naive transposition -> better ways to transpose
