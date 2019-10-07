@@ -57,9 +57,19 @@ In the litterature, all the models for attentive trajectory prediction are based
 One thing to notice is that the module is called for every prediction. This comes from the natural language processing use of this model, for instance for language prediction where it is apropos to select the relevant words in the input sentence for every predicted word.
 Another thing is that only the first parameter of the attention module changes from one call to another. It is the parameter Q from the previous paragraph, namely the prediction context. The value of the prediction context is the current decoder hidden state. The second parameter, namely the set of element whose relevance is to be evaluated, doesn't change from one call to another.
 
+The only thing that changes between the attentive model for social interactions (social attention) and the attentive model for spatial interactions (spatial attention) is the set of elements V.
+
 #### Set of element for social attention
+In social attention we want to give a weight to every pair of (main agent, ith neighbor), main agent being the agent we want to predict the upcoming path and the neighbors being the other agents in the scene during observation time. To that end, every V_i in that context corresponds to the extracted attribute vector (using the same LSTM encoder as before) from the observed trajectory of the ith neighbor.
+
+[insert image]
 
 #### Set of element for spatial attention
+
+In spatial attention we want to give a weight to every pair of (main agent, ith scene part), main agent being the agent we want to predict the upcoming path. To get a spatial representation of the scene, we have a top-view image of the scene (always the same image). We pass it through a CNN, VGG-19 pre-trained on the image-net dataset, resulting in some feature maps. Each feature map corresponds to an attribute vector caracterizing a part of the image (grid-like division of the image). Those vectors are the element in the set V.
+
+[insert image]
+
 
 #### Relevance of naïve transposition from NLP
 
