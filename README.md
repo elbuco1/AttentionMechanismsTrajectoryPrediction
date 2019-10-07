@@ -40,6 +40,11 @@ While addressing this goal, we started to question the evaluation settings and i
 
 Finally despite the claims of previous studies, that such models could take into account social and spatial interactions we try to show that it might not be the case (in the continuity of https://arxiv.org/abs/1903.07933?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+arxiv%2FQSXk+%28ExcitingAds%21+cs+updates+on+arXiv.org%29).
 
+
+## Study
+### Baselines
+#### Soft-attention
+Previous studies using attention mechanisms for trajectory prediction are based on its soft-attention variant. The soft-attention can be seen as a function of two inputs Q and V_{i}. 
 soft-attention-> differentiable  how does it work
 How was it transposed from NLP to trajectory prediction.
 Naive transposition -> better ways to transpose
