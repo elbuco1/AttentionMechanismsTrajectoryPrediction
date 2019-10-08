@@ -113,8 +113,27 @@ For the agents leaving the scene before the end of the observation time, we disc
 
 ##### Spatial samples
 
+For social samples, we do the same as for naïve samples regarding the trajectory of the main agent. In addition, for each sample, we take the top-view image of the corresponding scene and pass it through the convolutionnal part of a pre-trained VGG-19 neural network pretrained on the image net dataset. This yield 49 feature maps, each corresponding to one part of the scene(image).
+
 #### Metrics
+
+We use 5 different metrics for the evaluation of the models. 
+
+##### Positional metrics
+The first two metrics are the ones reaching consensus in the litterature. 
+
+The first one is the Average Displacement Error (ADE) which is basically the average point-wise euclidean distance between the predicted trajectory and the groundtruth one. This evaluates the mean displacement between a predicted point and the groundtruth one.
+
+The second one is the Final Displacement Error (FDE) which is the euclidean distance between the last point of the predicted trajectory and the last point of the groundtruth one.
+
+Both these metrics can be thought of as positional metrics in that they tend to evaluate the ability of a model to predict the exact trajectory that happened (point-wise). But as already mentionned in the litterature, given a context or a set of social and spatial constraints not only one future trajectory is possible. With that idea in mind, in order to compare the ability of models to use the environmental informations for trajectory prediction, we might be more interested in evaluating the feasibilty or realism of the predicted trajectories.
+
+To that end, we use three other metrics, two of which are proposed by us, and one which is taken from the litterature. Those metrics aren't perfect but they are a first step toward a better evaluation of interactional models.
+
+
 #### Training
+
+(cross validation)
 
 
 ### Results
