@@ -28,7 +28,7 @@ A whole lot of models have been proposed to use those informations for trajector
 
 The purpose of such mechanisms is to select automatically, based on the prediction context, which elements from a set of observations are relevant for the current prediction. For instance in NLP, one main task is language translation, which consists in given an input sentence in a language, to output its translation in another language. In this context, the set of elements is made of the words of the input sentence. At prediction time, the words from the output sentence are predicted sequentially. Attention mechanisms come from the observation that for a given predicted word, not every word in the input sentence is relevant. Therefore, attention mechanisms can be used to select which input words are relevant for every predicted word, making it possible to modify the input based on context.
 
-In trajectory prediction, attention mechanisms are used for taking into account two things: on one hand for social interactions, on the other hand for spatial interactions. In the case of social interactions, attention mechanisms are used to select which agents must be considered from the surrounding of the agent we want to predict the future position. In the case of spatial interactions, attention mechanisms are used to select which physical part of the scene (based on a top-view image) might have an impact on the future trajectory of the agent.
+In trajectory prediction, attention mechanisms are used for taking into account two things: on one hand for social interactions, on the other hand for spatial interactions. In the case of social interactions, attention mechanisms are used to select which agents must be considered from the surrounding of the agent we want to predict the future position (or main agent). In the case of spatial interactions, attention mechanisms are used to select which physical part of the scene (based on a top-view image) might have an impact on the future trajectory of the agent.
 
 
 
@@ -75,10 +75,6 @@ In spatial attention we want to give a weight to every pair of (main agent, ith 
 
 We claim that such a transposition of attention mechanisms from NLP to trajectory prediction is somewhat a naïve one, in that it used very similarly as in NLP without giving much thinking on its relevance for trajectory prediction. Our main observation is based upon the fact that these models compute, for each prediction an attention vector. Yet the set of elements to be considered in the soft-attention module stays the same between every prediction. The only parameter that changes is the context vector given by the hidden state of the decoder. In addition, since we predict a position every 0.4s, it might not be relevant to reassess at this rate the interactions between the main agent and its environment. We want to show that computing the attention vector just once in order to predict the whole future trajectory gives similar results.
 
+### The proposed model to test the claim
 
-
-How was it transposed from NLP to trajectory prediction.
-Naive transposition -> better ways to transpose
-                    -> does it actually work
-
-(étude des poids d'attention obtenus) étude qualitative sur un sous-ensemble de scènes
+The model we propose to back up our claim is very simple. First, we use a CNN to extract useful information from the observed trajectory of the main agent as a feature vector. We are using a CNN since it was shown that it gives better results than LSTM. We then call the soft-attention module on our set of elements using this attribute vector as context. We then concatenate the resulting attention vector and the attribute vector together and feed it into a Feed-Forward Neural Network that predicts simultaneously all the future positions. We make a simultaneous prediction since it has been shown that it allows to get rid of the error accumulation issue of recursive prediction using an LSTM.
