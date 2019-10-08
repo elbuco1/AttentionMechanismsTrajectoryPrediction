@@ -66,12 +66,14 @@ In social attention we want to give a weight to every pair of (main agent, ith n
 
 #### Set of element for spatial attention
 
-In spatial attention we want to give a weight to every pair of (main agent, ith scene part), main agent being the agent we want to predict the upcoming path. To get a spatial representation of the scene, we have a top-view image of the scene (always the same image). We pass it through a CNN, VGG-19 pre-trained on the image-net dataset, resulting in some feature maps. Each feature map corresponds to an attribute vector caracterizing a part of the image (grid-like division of the image). Those vectors are the element in the set V.
+In spatial attention we want to give a weight to every pair of (main agent, ith scene part), main agent being the agent we want to predict the upcoming path. To get a spatial representation of the scene, we have a top-view image of the scene (always the same image). We pass it through a CNN, VGG-19 pre-trained on the image-net dataset, resulting in some feature maps. Each feature map corresponds to an attribute vector caracterizing a part of the image (grid-like division of the image). Those vectors are the elements in the set V.
 
 [insert image]
 
 
 #### Relevance of naïve transposition from NLP
+
+We claim that such a transposition of attention mechanisms from NLP to trajectory prediction is somewhat a naïve one, in that it used very similarly as in NLP without giving much thinking on its relevance for trajectory prediction. Our main observation is based upon the fact that these models compute, for each prediction an attention vector. Yet the set of elements to be considered in the soft-attention module stays the same between every prediction. The only parameter that changes is the context vector given by the hidden state of the decoder. In addition, since we predict a position every 0.4s, it might not be relevant to reassess at this rate the interactions between the main agent and its environment. We want to show that computing the attention vector just once in order to predict the whole future trajectory gives similar results.
 
 
 
