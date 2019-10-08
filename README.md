@@ -103,6 +103,14 @@ We do it this way to keep the ratio between both axes, and to keep the proportio
 
 ##### Social samples
 
+For social samples, we do the same as for naïve samples regarding the trajectory of the main agent. Since we want to take into account the other agents, we take as input the observed trajectories of all agents present in the scene during the 8 units of time of the main agent observed trajectory. 
+
+For the agents leaving the scene before the end of the observation time, we discard their trajectories. For those entering the scene during the observation time, we deal with it two different ways:
+
+* If the model uses an LSTM to process trajectories, we add zero padding at the beginning of incomplete trajectories for data storing and then ignore those padding points at training time.
+
+* If the model uses a CNN, we add zero padding at the beginning of incomplete trajectories and feed them as is in the CNN since zero values don't have an impact on convolution operation.
+
 ##### Spatial samples
 
 #### Metrics
