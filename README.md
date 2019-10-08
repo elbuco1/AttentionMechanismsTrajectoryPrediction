@@ -133,7 +133,7 @@ To that end, we use three other metrics, two of which are proposed by us, and on
 
 #### Training
 
-(cross validation)
+(cross validation, random search)
 
 
 ### Results
