@@ -130,6 +130,11 @@ Both these metrics can be thought of as positional metrics in that they tend to 
 
 To that end, we use three other metrics, two of which are proposed by us, and one which is taken from the litterature. Those metrics aren't perfect but they are a first step toward a better evaluation of interactional models.
 
+##### Kinetic realism
+##### Near-collisions percentage
+
+##### Scenes traversability
+
 
 #### Training
 
