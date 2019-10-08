@@ -89,6 +89,21 @@ We want to evaluate the ability of the described models to take into account soc
 Along the trajectories, we are given a top-view image of each scene and the types of every agents.
 
 #### Training samples
+There are three types of training samples, the one for naïve approaches, the one for social models and the one for spatial models. The trajectories are expressed in pixel for every scenes. We convert them to the meter space.
+##### Naïve samples
+For naïve models, every trajectories are split into subtrajectories of 20 subsequent positions. For each one of those, we take as input the first 8 observed positions and use the last 12 as labels. 
+
+As labels, as proposed in the litterature, we don't use absolute positions, but offsets with respect to the last position of the input sub-trajectory.
+
+For the inputs, all positions are expressed in a 2D spatial system where the origin lies at the bottom  left of the (image of the) scene. We normalize the absolute positions across all the scenes using min-max normalization. To that end, we compute the min and max value (x_min and x_max) across all scenes and across both axes. We then normalize every value x (which corresponds to coordinates on either axis) using the following formula:
+
+[insert minmax formula (x- xmin)/(xmax-xmin)]
+
+We do it this way to keep the ratio between both axes, and to keep the proportions between every scenes.
+
+##### Social samples
+
+##### Spatial samples
 
 #### Metrics
 #### Training
