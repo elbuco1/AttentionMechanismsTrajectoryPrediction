@@ -78,3 +78,21 @@ We claim that such a transposition of attention mechanisms from NLP to trajector
 ### The proposed model to test the claim
 
 The model we propose to back up our claim is very simple. First, we use a CNN to extract useful information from the observed trajectory of the main agent as a feature vector. We are using a CNN since it was shown that it gives better results than LSTM. We then call the soft-attention module on our set of elements using this attribute vector as context. We then concatenate the resulting attention vector and the attribute vector together and feed it into a Feed-Forward Neural Network that predicts simultaneously all the future positions. We make a simultaneous prediction since it has been shown that it allows to get rid of the error accumulation issue of recursive prediction using an LSTM.
+
+### Evaluation protocol
+
+
+#### Dataset
+
+We want to evaluate the ability of the described models to take into account social and spatial interactions between an agent and its environment. To that end, we need a dataset where first those interactions actually exist and second those interactions actually have an influence on the way the agents move in scenes. We chose to use the Stanford Drone Dataset (SDD). Its a dataset where trajectories have been extracted from 8 different scenes using video taken from a drone. The scenes have various spatial structure, some of which highly influence agents motion (not only linear path). There are 20K trajectories in this datasets. The providers of the dataset claim that it features 6 different classes of agents such as car drivers, bicyclists, pedestrians and others. But in practice it's mostly pedestrians and bicyclists accounting each for half of the trajectories. 
+
+Along the trajectories, we are given a top-view image of each scene and the types of every agents.
+
+#### Training samples
+
+#### Metrics
+#### Training
+
+
+### Results
+### Discussion
