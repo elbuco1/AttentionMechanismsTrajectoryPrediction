@@ -153,8 +153,40 @@ The size of the squares can vary allowing for different levels of granularity.
 
 #### Training
 
-(cross validation, random search)
+The dataset is split in three parts. The split is scene-based in that every part contains a subset of the scenes.  The three parts correspond to the training, validation and test sets.
 
+##### Hyperparameters selection
+
+Hyperparameters selection is performed using random search. The models are trained on the training set and evaluated on the validation set. Once the best hyperparameters have been selected, the model is trained again on both the training and validation set. The final evaluation is performed on the test set.
 
 ### Results
+#### Models
+* rnn-mlp: the naïve baseline using an LSTM to process the input trajectory and a Feed-Forward Neural Network to predict simultaneously every future positions.
+
+* cnn-mlp: the naïve baseline using a CNN to process the input trajectory and a Feed-Forward Neural Network to predict simultaneously every future positions.
+
+* s2s-social-soft: the model based on the sequence-to-sequence architecture and a soft-attention module to account for social interactions.
+
+* s2s-spatial-soft: the model based on the sequence-to-sequence architecture and a soft-attention module to account for spatial interactions.
+
+* c-social-soft: the proposed model using a CNN to process the input trajectory, a soft-attention module to account for social interactions and a Feed-Forward Neural Network to predict simultaneously every future positions.
+
+* c-spatial-soft: the proposed model using a CNN to process the input trajectory, a soft-attention module to account for spatial interactions and a Feed-Forward Neural Network to predict simultaneously every future positions.
+
+
+#### Positional metrics
+We compute this metric for the six models. On the x-axis is reported the Average Displacement Error and on the y-axis the Final Displacement Error. For both these metrics, the lower the better. Therefore the more a model is at the bottom left, the best it is. We circled in green the attentive models from the litterature and in red the two models that we proposed.
+
+#### Kinetic realism
+We compute this metric for the six models. On the x-axis is reported the Wasserstein distance between speed distributions and on the y-axis the Wasserstein distance between acceleration distributions. For both these metrics, the lower the better. Therefore the more a model is at the bottom left, the best it is. We circled in green the attentive models from the litterature and in red the two models that we proposed.
+#### Near-collisions percentage
+We compute this metric for four of the six models (the two naïve baselines and the model accounting for social interactions). On the x-axis is reported the diameter of the circle and on the y-axis the average percentage of collisions per frame. 
+#### Scenes traversability
+We compute this metric for four of the six models (the two naïve baselines and the model accounting for spatial interactions). On the x-axis is reported the side of cell and on the y-axis the average L1 distance between traversability
+vectors.
 ### Discussion
+
+# Annexes
+## Code structure
+## Run the project
+## model list 
