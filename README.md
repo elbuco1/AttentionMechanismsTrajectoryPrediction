@@ -177,15 +177,35 @@ Hyperparameters selection is performed using random search. The models are train
 #### Positional metrics
 We compute this metric for the six models. On the x-axis is reported the Average Displacement Error and on the y-axis the Final Displacement Error. For both these metrics, the lower the better. Therefore the more a model is at the bottom left, the best it is. We circled in green the attentive models from the litterature and in red the two models that we proposed.
 
+We can see that the three models using a CNN are the best and that the two models using an LSTM for the prediction part are the worst, thus confirming the results of the litterature. The c-social-soft improves the prediction performances compared to its naive equivalent cnn-mlp.
+The c-spatial-soft worsens the prediction performances compared to its naive equivalent cnn-mlp.
+
+Both s2s-social-soft and s2s-spatial-soft worsen the prediction performances compared to their naive equivalent rnn-mlp. 
+
+We don't see a loss in performance by computing the attention vector only once compared to computing it for every prediction. The differences in performance are not really big since the best model is at 1.2m of ADE and the worst is at 1.5m, a 30 centimeters difference.
+
+
 #### Kinetic realism
 We compute this metric for the six models. On the x-axis is reported the Wasserstein distance between speed distributions and on the y-axis the Wasserstein distance between acceleration distributions. For both these metrics, the lower the better. Therefore the more a model is at the bottom left, the best it is. We circled in green the attentive models from the litterature and in red the two models that we proposed.
+
+[work on wasserstein distance interpretation (same weight/ number of points/ distance traveled/ plot distributions]
+
+
 #### Near-collisions percentage
-We compute this metric for four of the six models (the two naïve baselines and the model accounting for social interactions). On the x-axis is reported the diameter of the circle and on the y-axis the average percentage of collisions per frame. 
+We compute this metric for four of the six models (the two naïve baselines and the model accounting for social interactions). On the x-axis is reported the diameter of the circle and on the y-axis the average percentage of collisions per frame.  
+The two lower curves that matches perfectly correspond to the two models taking into account social interactions. We can see that there is no differences in performance between them. The two upper curves correspond to the naïve approaches which perform similarly. This chart shows a visible impact of social attention (average of around 17%  reduction of collision percentage). Furthermore it shows that computing the attention vector only once compared to computing it for every prediction doesn't worsen the ability of the model to take into account social interactions.
 #### Scenes traversability
 We compute this metric for four of the six models (the two naïve baselines and the model accounting for spatial interactions). On the x-axis is reported the side of cell and on the y-axis the average L1 distance between traversability
 vectors.
+
+The two lower curves that matches perfectly correspond to the two naïve baselines. The two upper curves correspond to the models taking into account spatial interactions. This metric doesn't show any impact of taking into account spatial interactions for prediction models.
+
+[interpretation of values/ plot grids/ number of cells]
+
+
 ### Discussion
 
+# What's next ?
 # Annexes
 ## Code structure
 ## Run the project
