@@ -202,10 +202,25 @@ The two lower curves that matches perfectly correspond to the two naïve baselin
 
 [interpretation of values/ plot grids/ number of cells]
 
-
+#### Prediction time
+The c-social-soft and c-spatial-soft models that compute only one time the attention vector, lead to a division of the  prediction time by the model of 7 and 9 respectively.
 ### Discussion
 
+We showed that computing only once the attention vector didn't worsen the prediction quality given every metrics and lead to a huge reduction in prediction time. Especially both social models exhibited same level performances regarding the near-collision percentage metric. Therefore, computing the attention vector for every timestep was redundant.
+
+The spatial metric didn't show any improvement in performance due to using spatial attention. Since no other metric showed the opposite, the problem probably comes from the model. Either a mistake in implementation or a flaw in the model might be the reason for this.
+
+The additional metrics allowed for a richer evaluation especially for the social models.
+
+The limits of this work are the following:
+* Differences in agent types were ignored.
+* Dataset was taken on a campus where agent motion might be less constraint by its environment than in a traffic situation. Therefore, interactions might be harder to modelize in this data distribution.
+* Tackling and evaluating the problem as a regression is problematic since trajectory prediction is a multimodal problem. Using GANs is a first step toward adressing this limit but it's not conclusive yet since the evaluation is still made using positionnal metrics.
+* The study lacks qualitative and quantitative study of attention weights in diverse situation that could help building an intuition of what is going on with the network.
+* It might be the case that attention mechanisms in this problem doesn't work as yet interpreted and a further examination should be conducted.
+
 # What's next ?
+We'll be working on an article evaluating qualitatively and quantitatively whether attention mechanisms help for social interactions modelisation or not.
 # Annexes
 ## Code structure
 ## Run the project
