@@ -282,6 +282,10 @@ The limits of this work are the following:
 * The study lacks qualitative and quantitative study of attention weights in diverse situation that could help building an intuition of what is going on with the network.
 * It might be the case that attention mechanisms in this problem doesn't work as yet interpreted and a further examination should be conducted.
 
+<div align='center'>
+<img src="images/animation.gif"></img>
+</div>
+
 # What's next ?
 We'll be working on an article evaluating qualitatively and quantitatively whether attention mechanisms help for social interactions modelisation or not.
 # Annexes
