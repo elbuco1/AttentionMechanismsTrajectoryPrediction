@@ -223,5 +223,36 @@ The limits of this work are the following:
 We'll be working on an article evaluating qualitatively and quantitatively whether attention mechanisms help for social interactions modelisation or not.
 # Annexes
 ## Code structure
+### Data
+This folder contains all the data used in the project. 
+* The downloaded data goes into the external directory.
+* It is then extracted to the the raw directory as one csv file per scene.
+* Those files are then transformed and stored in the interim directory.
+* Samples are created and stored in an hdf5 file while ordered by scenes.
+* Samples are regrouped as a big array in another hdf5 file, ready for training.
+
+### Src
+This folder contains all the source code.
+* data: code for data extraction and preprocessing.
+* features: code for samples creation.
+* models: contains code for models training and models evaluation.
+* models/models: all the pytorch models.
+* models/datasets: classes for custom dataset and dataloader.
+* models/classes: class for neural network training.
+* models/parameters: all the json files for project parameters.
+* models/parameters/models: one json file per deep learning model.
+* models/parameters/data: all the json file for data processing parameters.
+* models/parameters/visualization: parameters for the visualization module.
+* models/visualization: code for plotting metrics and create animations.
+
+### Reports
+This folder contains the outputs of the pipeline.
+* reports/evaluation: store the metrics results for the models
+* reports/figures: outputs from the visualization module
+* reports/gradients: gradient plots while training
+* reports/losses: losses plots while training
+
 ## Run the project
-## model list 
+* Install requirements.
+* Download the stanford drone dataset here: http://cvgl.stanford.edu/projects/uav_data/ .
+* Follow makefile instructions.
