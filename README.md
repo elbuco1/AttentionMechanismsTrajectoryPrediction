@@ -78,7 +78,10 @@ Previous studies using attention mechanisms for trajectory prediction are based 
 
 In the litterature, all the models for attentive trajectory prediction are based upon the sequence-to-sequence architecture. First the observed trajectory of the agent we want to predict the next position is fed into an LSTM (the encoder) that extracts automatically a fixed-size attribute vector. This vector is used to initialize the hidden state of another LSTM (the decoder) which will be used to predict the following positions. The hidden state of the decoder represents the prediction context. It is first initialized based on the observed trajectory and then updated gradually as we go along the prediction process. The main difference between the "naïve" sequence-to-sequence model and the attentive one takes place during the prediction part. Before, we were taking as decoder input either the last position of the observed trajectory or the last predicted position and so on recursively. In the attentive alternative, for each prediction, we call the soft-attention module and concatenate the attention vector to the decoder regular input. 
 
-[insérer image] 
+<div align='center'>
+<img src="images/baseline.png"></img>
+</div>
+
 
 One thing to notice is that the module is called for every prediction. This comes from the natural language processing use of this model, for instance for language prediction where it is apropos to select the relevant words in the input sentence for every predicted word.
 Another thing is that only the first parameter of the attention module changes from one call to another. It is the parameter Q from the previous paragraph, namely the prediction context. The value of the prediction context is the current decoder hidden state. The second parameter, namely the set of element whose relevance is to be evaluated, doesn't change from one call to another.
@@ -88,13 +91,10 @@ The only thing that changes between the attentive model for social interactions 
 #### Set of element for social attention
 In social attention we want to give a weight to every pair of (main agent, ith neighbor), main agent being the agent we want to predict the upcoming path and the neighbors being the other agents in the scene during observation time. To that end, every V_i in that context corresponds to the extracted attribute vector (using the same LSTM encoder as before) from the observed trajectory of the ith neighbor.
 
-[insert image]
 
 #### Set of element for spatial attention
 
 In spatial attention we want to give a weight to every pair of (main agent, ith scene part), main agent being the agent we want to predict the upcoming path. To get a spatial representation of the scene, we have a top-view image of the scene (always the same image). We pass it through a CNN, VGG-19 pre-trained on the image-net dataset, resulting in some feature maps. Each feature map corresponds to an attribute vector caracterizing a part of the image (grid-like division of the image). Those vectors are the elements in the set V.
-
-[insert image]
 
 
 #### Relevance of naïve transposition from NLP
@@ -105,6 +105,11 @@ We claim that such a transposition of attention mechanisms from NLP to trajector
 
 The model we propose to back up our claim is very simple. First, we use a CNN to extract useful information from the observed trajectory of the main agent as a feature vector. We are using a CNN since it was shown that it gives better results than LSTM. We then call the soft-attention module on our set of elements using this attribute vector as context. We then concatenate the resulting attention vector and the attribute vector together and feed it into a Feed-Forward Neural Network that predicts simultaneously all the future positions. We make a simultaneous prediction since it has been shown that it allows to get rid of the error accumulation issue of recursive prediction using an LSTM.
 
+<div align='center'>
+<img src="images/prop.png"></img>
+</div>
+
+
 ### Evaluation protocol
 
 
@@ -113,6 +118,10 @@ The model we propose to back up our claim is very simple. First, we use a CNN to
 We want to evaluate the ability of the described models to take into account social and spatial interactions between an agent and its environment. To that end, we need a dataset where first those interactions actually exist and second those interactions actually have an influence on the way the agents move in scenes. We chose to use the Stanford Drone Dataset (SDD). Its a dataset where trajectories have been extracted from 8 different scenes using video taken from a drone. The scenes have various spatial structure, some of which highly influence agents motion (not only linear path). There are 20K trajectories in this datasets. The providers of the dataset claim that it features 6 different classes of agents such as car drivers, bicyclists, pedestrians and others. But in practice it's mostly pedestrians and bicyclists accounting each for half of the trajectories. 
 
 Along the trajectories, we are given a top-view image of each scene and the types of every agents.
+
+<div align='center'>
+<img src="images/dataset.png"></img>
+</div>
 
 #### Training samples
 There are three types of training samples, the one for naïve approaches, the one for social models and the one for spatial models. The trajectories are expressed in pixel for every scenes. We convert them to the meter space.
