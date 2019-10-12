@@ -16,8 +16,15 @@ We refer to this task as naïve prediction when the only information used to pre
 </div>
 It has been shown that predicting recursively the future trajectory leads to an error accumulation along the predicted position. Indeed since the model bases its prediction on previously made predictions, it depends on the error previously made on those. To address this issue, one can use the LSTM-MLP model that replaces de LSTM decoder with a simple Multi Layer Perceptron( MLP) network. This simpler model predicts all the future positions simultaneously getting rid of the error accumulation issue.
 
+<div align='center'>
+<img src="images/lstm_mlp.png"></img>
+</div>
+
 Finally, it's been shown that against all expectations, using a Convolutionnal Neural Network (CNN) along the temporal dimension instead of Recurrent Neural Network (RNN) gives slightly better results when predicting the future trajectory and is way faster due to the fact that convolution operations can be made in parallel whereas operations in an RNN are made sequentially. We refer in this project to this model as CNN-MLP.
 
+<div align='center'>
+<img src="images/cnn_mlp.png"></img>
+</div>
 All three models are implemented in this project and referred as seq2seq, rnn-mlp and cnn-mlp.
 
 #### Using the environment
