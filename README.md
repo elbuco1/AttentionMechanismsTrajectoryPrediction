@@ -150,6 +150,10 @@ For the agents leaving the scene before the end of the observation time, we disc
 
 For social samples, we do the same as for naïve samples regarding the trajectory of the main agent. In addition, for each sample, we take the top-view image of the corresponding scene and pass it through the convolutionnal part of a pre-trained VGG-19 neural network pretrained on the image net dataset. This yield 49 feature maps, each corresponding to one part of the scene(image).
 
+<div align='center'>
+<img src="images/samples.png"></img>
+</div>
+
 #### Metrics
 
 We use 5 different metrics for the evaluation of the models. 
@@ -165,25 +169,33 @@ Both these metrics can be thought of as positional metrics in that they tend to 
 
 To that end, we use three other metrics, two of which are proposed by us, and one which is taken from the litterature. Those metrics aren't perfect but they are a first step toward a better evaluation of interactional models.
 
+<div align='center'>
+<img src="images/ade.png"></img>
+</div>
+
 ##### Kinetic realism
 
 The first additional metric aims at evaluating the ability of a model to predict realistic speeds and accelerations. Indeed we are not only interested in the predicted path but in the way the agent moves along this path as well. To that end, we want to evaluate the difference between the speed and acceleration distributions learned by a model and those observed in the groundtruth.
 To do this, we estimate the empirical speed distribution by computing every observed speeds in the dataset. Then given a model, we make every predictions on the test set and compute the corresponding speeds from those predictions. We compute a distance between those two distributions. The distance is called Wasserstein distance. This distance is a true distance and therefore is symmetric. Intuitively it represents the amount of work needed to transform one distribution into another. We compute this metric for both the acceleration and speed distributions. The bigger the distance, the worst the ability of the evaluated model to predict realistic trajectories from a kinetic point of view.
 
-[insert image]
 
 ##### Near-collisions percentage
 
 This metric aims at evaluating the ability of a model to predict socially acceptable trajectories. The near collisions percentage metric is taken from the litterature. For a social sample, we use a model to predict alternately the future trajectory of every agent in the scene. We then for every frame (time unit) look for near collisions. A near collision happens when two agents fit in a circle of a given diameter. We compute for each frame the percentage of near collisions and then average it on the test set. We can vary the diameter of the circle which allows for different levels of granularity.
 
-[insert image]
+<div align='center'>
+<img src="images/conflict_socials.png"></img>
+</div>
+
 
 ##### Scenes traversability
 
 This metric aims at evaluating the ability of a model to predict trajectories that are realistic from a spatial point of view. We want a model that doesn't predict trajectories conflicting with non-traversable elements of the scenes. To that end, we divide each scene using a grid of same-sized squares.  To get the empirical traversability of a scene in the dataset, we compute for every cell of the grid the proportion of points that occur in it. We then make the predictions for every spatial samples in the test set and compute the proportion of predicted points occuring in every cell. Those grids of proportions correspond to the empirical and learned traversability distributions of a scene. We then flatten those grid to get a vector-like representation and compute the L1 distance between them. The L1 distances are averaged over the different scenes for a given model.
 The size of the squares can vary allowing for different levels of granularity.
 
-[insert image]
+<div align='center'>
+<img src="images/spatiale.png"></img>
+</div>
 
 
 #### Training
