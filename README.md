@@ -69,7 +69,10 @@ Finally despite the claims of previous studies, that such models could take into
 #### Soft-attention
 Previous studies using attention mechanisms for trajectory prediction are based on its soft-attention variant. The soft-attention can be seen as a function A(.,.) of two inputs Q and V_i. Q and V_i are attribute vectors. The function A(Q, V_i) is a feed-forward neural network  whose output is of size 1. Basically, Q and V_i are concatenated and fed in the neural network which outputs a positive real number. In the function, Q embodies the prediction context and V_i is an element for which we want to evaluate the relevance for the next prediction. The ouput S_i of A(Q, V_i) is to be interpreted as the relevance of V_i for the next prediction based on the current prediction context Q. This operation is repeated for every V_i from a set V. The scores are then normalized using a softmax function so that they sum to one. This normalization results in the attention weights W. The attention vector is the weighted sum of attribute vectors V_i by its attention weight W_i. The intuition behind it is that the attention vector contains informations from elements V_i proportionally to their relevance for the coming prediction. This process is differentiable and therefore easy to use with backpropagation in deep learning.
 
-[insérer image]
+<div align='center'>
+<img src="images/soft_attention.png"></img>
+</div>
+
 
 ### The baseline for attentive trajectory prediction
 
