@@ -184,7 +184,7 @@ To do this, we estimate the empirical speed distribution by computing every obse
 This metric aims at evaluating the ability of a model to predict socially acceptable trajectories. The near collisions percentage metric is taken from the litterature. For a social sample, we use a model to predict alternately the future trajectory of every agent in the scene. We then for every frame (time unit) look for near collisions. A near collision happens when two agents fit in a circle of a given diameter. We compute for each frame the percentage of near collisions and then average it on the test set. We can vary the diameter of the circle which allows for different levels of granularity.
 
 <div align='center'>
-<img src="images/conflict_socials.png"></img>
+<img src="images/conflicts_socials.png"></img>
 </div>
 
 
