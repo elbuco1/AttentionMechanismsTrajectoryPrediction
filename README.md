@@ -231,26 +231,42 @@ Both s2s-social-soft and s2s-spatial-soft worsen the prediction performances com
 
 We don't see a loss in performance by computing the attention vector only once compared to computing it for every prediction. The differences in performance are not really big since the best model is at 1.2m of ADE and the worst is at 1.5m, a 30 centimeters difference.
 
+<div align='center'>
+<img src="images/ade_fde.png"></img>
+</div>
 
 #### Kinetic realism
 We compute this metric for the six models. On the x-axis is reported the Wasserstein distance between speed distributions and on the y-axis the Wasserstein distance between acceleration distributions. For both these metrics, the lower the better. Therefore the more a model is at the bottom left, the best it is. We circled in green the attentive models from the litterature and in red the two models that we proposed.
 
-[work on wasserstein distance interpretation (same weight/ number of points/ distance traveled/ plot distributions]
-
+<div align='center'>
+<img src="images/kinetic.png"></img>
+</div>
 
 #### Near-collisions percentage
 We compute this metric for four of the six models (the two naïve baselines and the model accounting for social interactions). On the x-axis is reported the diameter of the circle and on the y-axis the average percentage of collisions per frame.  
 The two lower curves that matches perfectly correspond to the two models taking into account social interactions. We can see that there is no differences in performance between them. The two upper curves correspond to the naïve approaches which perform similarly. This chart shows a visible impact of social attention (average of around 17%  reduction of collision percentage). Furthermore it shows that computing the attention vector only once compared to computing it for every prediction doesn't worsen the ability of the model to take into account social interactions.
+
+<div align='center'>
+<img src="images/social_metric.png"></img>
+</div>
+
 #### Scenes traversability
 We compute this metric for four of the six models (the two naïve baselines and the model accounting for spatial interactions). On the x-axis is reported the side of cell and on the y-axis the average L1 distance between traversability
 vectors.
 
 The two lower curves that matches perfectly correspond to the two naïve baselines. The two upper curves correspond to the models taking into account spatial interactions. This metric doesn't show any impact of taking into account spatial interactions for prediction models.
 
-[interpretation of values/ plot grids/ number of cells]
+<div align='center'>
+<img src="images/spatial_metric.png"></img>
+</div>
 
 #### Prediction time
 The c-social-soft and c-spatial-soft models that compute only one time the attention vector, lead to a division of the  prediction time by the model of 7 and 9 respectively.
+
+<div align='center'>
+<img src="images/prediction_time.png"></img>
+</div>
+
 ### Discussion
 
 We showed that computing only once the attention vector didn't worsen the prediction quality given every metrics and lead to a huge reduction in prediction time. Especially both social models exhibited same level performances regarding the near-collision percentage metric. Therefore, computing the attention vector for every timestep was redundant.
